@@ -57,7 +57,7 @@ export default function BusinessCase() {
             <line x1="20" x2="410" y1="110" y2="110" stroke="var(--ink)" />
             {cum.map((v, i) => { const h = (Math.abs(v) / cmax) * 85; const x = 30 + i * 64; return (
               <g key={i}>
-                <rect x={x} width="40" y={v >= 0 ? 110 - h : 110} height={h} fill={v >= 0 ? "var(--teal-brand)" : "var(--orange)"} />
+                <rect x={x} width="40" y={v >= 0 ? 110 - h : 110} height={h} fill={v >= 0 ? "var(--teal)" : "var(--orange)"} />
                 <text x={x + 20} y={v >= 0 ? 104 - h : 124 + h} textAnchor="middle" fontSize="12" fontWeight="700">{paren(v)}</text>
                 <text x={x + 20} y="216" textAnchor="middle" fontSize="11" fill="var(--muted)">Y{i}</text>
               </g>); })}
