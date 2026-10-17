@@ -1,49 +1,91 @@
-# Harbourline Foods demand planner (prototype)
+# Harbourline Foods demand planner
 
 > Prototype built by Ankit Mishra. Harbourline Foods is a fictional retailer; all data is synthetic and calibrated to public Statistics Canada series. Not affiliated with, or built for, any company.
 
-**Live demo:** https://harbourline-demand-planner.vercel.app (no sign-in). The site holds no user data: decisions, sent orders and offers live in the browser.
+**Live demo:** https://harbourline-demand-planner.vercel.app (no sign-in; nothing is stored server-side, so what you do in the planner stays in your browser).
 
-A better forecast tells each store how much to order. This prototype shows the three steps of a store forecasting pilot on 24 months of synthetic data for Harbourline Foods, a fictional mid-sized Canadian grocer (300 stores, $200M revenue):
+A better forecast tells each store how much to order. This repository is a working, end-to-end prototype of a grocery demand-forecasting pilot: a data pipeline, four forecasting models backtested in dollars, a store order screen that planners review by exception, a simulated order-to-supplier loop, an autonomy ladder that each product category earns from evidence, a worked business case and a seven-week delivery plan. It runs for a fictional mid-sized Canadian grocer, Harbourline Foods (300 stores, $200M revenue), on a 20-store pilot.
 
-1. **Look at past sales, promotions and holidays:** 104 weeks of weekly sales for 20 pilot stores and 136 products, calibrated to public Statistics Canada series.
-2. **Predict demand for each store and product:** a "same week last year" baseline, a classic time series model, gradient-boosted machine learning and hierarchical reconciliation, tested on a 12-week holdout and judged in dollars.
-3. **Tell planners what to order:** a store order screen with the forecast for next week and the week after, a P10 to P90 range, stock on hand and on order, and a suggested order rounded to the case pack, reviewed by exception. Approved orders go out as one purchase order per supplier, and each category earns autonomy from evidence (see [After approval](#after-approval-sending-orders-and-earning-autonomy)).
+![Landing page](docs/screenshots/landing-desktop.png)
 
-The Business case page works the numbers through from a small set of stated assumptions: $1.06M a year (low $0.72M, high $1.40M), payback in 2.7 years, and the $0.70M go/no-go line.
+| Store order review | Item drawer | Model comparison | Business case |
+|---|---|---|---|
+| ![Planner](docs/screenshots/planner-desktop.png) | ![Planner detail](docs/screenshots/planner-drawer-desktop.png) | ![Models](docs/screenshots/models-desktop.png) | ![Business case](docs/screenshots/business-case-desktop.png) |
 
-![Planner, desktop](docs/screenshots/planner-desktop.png)
+Phone width: [landing](docs/screenshots/landing-mobile.png) · [planner](docs/screenshots/planner-mobile.png) · [drawer](docs/screenshots/planner-drawer-mobile.png) · [models](docs/screenshots/models-mobile.png) · [business case](docs/screenshots/business-case-mobile.png) · [delivery plan](docs/screenshots/plan-mobile.png) · [security](docs/screenshots/security-mobile.png) · [about](docs/screenshots/about-mobile.png)
 
-| Order review drawer | Model comparison | Business case |
-|---|---|---|
-| ![Planner detail](docs/screenshots/planner-drawer-desktop.png) | ![Models](docs/screenshots/models-desktop.png) | ![Business case](docs/screenshots/business-case-desktop.png) |
+## Contents
 
-Phone width: [planner](docs/screenshots/planner-mobile.png) · [models](docs/screenshots/models-mobile.png) · [business case](docs/screenshots/business-case-mobile.png) · [delivery plan](docs/screenshots/plan-mobile.png) · [security](docs/screenshots/security-mobile.png) · [about](docs/screenshots/about-mobile.png) · [landing](docs/screenshots/landing-mobile.png)
+- [What it does](#what-it-does)
+- [Use cases](#use-cases)
+- [Pages](#pages)
+- [Presenting the demo in five minutes](#presenting-the-demo-in-five-minutes)
+- [Results](#results-12-week-holdout-20-stores--136-products-synthetic-data)
+- [Business case](#how-it-maps-to-the-business-case)
+- [The data](#the-data)
+- [The models](#the-models-pipelinetrain_backtestpy)
+- [Review rules and thresholds](#review-rules-and-thresholds-pipelineexportpy)
+- [After approval: sending orders and earning autonomy](#after-approval-sending-orders-and-earning-autonomy)
+- [How it is built](#how-it-is-built)
+- [Run it locally](#run-it-locally)
+- [Deliberate simplifications](#deliberate-simplifications) and [Limitations](#limitations)
+- [What a real engagement would add](#what-a-real-engagement-would-add)
 
-## Presenting this demo (five minutes)
+## What it does
 
-1. **Open the planner** from the landing page. It lands on Store S09, Toronto Leslieville.
-2. **Store order review.** Point at the yellow tile: 24 of 136 items need a planner this week; the rest are auto-approved. The table is sorted needs-review first, then priority, then days of supply. Read one High row aloud: stock runs out before the next delivery.
-3. **Open an item** (click a row). Walk the drawer top to bottom: forecast vs actual with the P10–P90 band, "why this forecast", the order calculation, inventory position, fresh spoilage, and the suggested offer if there is one.
-4. **Accept or override.** Accept one suggestion; override another with a reason. Show the change log filling up.
-5. **Send orders.** "Review and send" is blocked while exceptions remain; use "Accept the N remaining" then review the sheet: one purchase order per supplier, lead time, expected delivery, open-to-buy check. Send. Watch the Sent orders cards move Sent → Acknowledged (20 s) → Shipped (60 s) → Received.
-6. **Autonomy ladder** (chip beside the search box). Thresholds on top, evidence per category below: Pantry earned L3 in the backtest and lost it; fresh stays at L2.
-7. **Suggested offers.** Markdowns on fresh stock that will outlast its shelf life; flyer candidates with excess cover or a strong lift last year. Accept one, dismiss one with a reason.
-8. **Business case.** Three levers, $1.06M against the $0.70M line, payback 2.7 years; the synthetic backtest is labelled illustrative. Close on the Delivery plan: seven weeks, three checkpoints, and how the pieces connect.
+1. **Look back.** 104 weeks of weekly sales, promotions, holidays and weather for 20 pilot stores and 136 products, generated with seasonality and food-price inflation calibrated to public Statistics Canada series.
+2. **Predict.** A "same week last year" baseline, a classic time series model, gradient-boosted machine learning and hierarchical reconciliation, tested on a 12-week holdout and judged on the dollars they save (lost margin, waste, carrying cost), not only on error.
+3. **Order.** A store order screen with the forecast for next week and the week after, a P10 to P90 range, stock on hand and on order, and a suggested order rounded to the case pack. Items that pass every rule are approved automatically; planners decide the exceptions. Approved orders go out as one purchase order per supplier, suppliers acknowledge and ship (simulated), and each category earns more autonomy as its evidence accumulates.
+4. **Decide.** A business case from stated assumptions ($1.06M a year in the base case against a $0.70M go/no-go line, payback 2.7 years) and a seven-week discovery plan with three checkpoints where the work stops if the numbers do not clear.
 
-"Clear demo changes" on the planner page resets the browser state between runs.
+## Use cases
+
+The prototype is a complete reference implementation of a "prove it, then scale it" AI pilot. It is useful to several kinds of reader; start where your question is.
+
+### A retailer or grocer weighing AI-assisted replenishment
+
+You want to know what the end state looks like for your planners before you commit to a vendor or a build. Open the [planner](https://harbourline-demand-planner.vercel.app/planner/), pick a store, and work a week: accept a suggestion, override another with a reason, send the purchase orders, watch the supplier replies, and open the autonomy ladder to see what a category has to prove before the system orders on its own. The [Data & security](https://harbourline-demand-planner.vercel.app/security/) page lists what your IT and data owners would sign off at weeks 5 and 7, and the [Delivery plan](https://harbourline-demand-planner.vercel.app/plan/) shows what you would need to provide in week 1.
+
+### An AI consultancy or strategy team running discovery to pilot
+
+Every page maps to an engagement deliverable. Discovery (7 weeks): the value tree and three checkpoints (week 2 lost demand, week 5 model beats baseline, week 7 business case) are on the Delivery plan; the week 5 deliverable is the [Model comparison](https://harbourline-demand-planner.vercel.app/models/), and the week 7 deliverable is the [Business case](https://harbourline-demand-planner.vercel.app/business-case/). Pilot (20 to 30 stores, shadow mode): the planner screen. Rollout: the autonomy ladder and the integration loop. The six-risk table, the owner column and the "a failed checkpoint is a result, not a failure" rule are the governance scaffolding a client sponsor expects to see. Reuse the structure; swap in the client's data in week 1.
+
+### An enterprise AI enablement or transformation lead
+
+Adoption is designed in, not bolted on: review by exception so planners see only what needs a decision; a reason code on every override, logged and visible, so the model learns from the people using it; an autonomy ladder (L1 approve every line, L2 exceptions only, L3 autonomous with veto) with thresholds set per category class, so trust is earned with evidence and can be lost again; and a named, scoped service account for anything the system writes back to the ordering system. The integration page describes the EDI 850/855/856 loop retailers already run, so the change is to the decision, not the plumbing.
+
+### An investor or portfolio-operations team
+
+This is a stage-gated spend. $0.175M of discovery buys three go/no-go decisions before the $0.45M pilot and the $0.60M rollout, and the whole programme stops if real profit does not clear $0.70M a year. The levers are set at or below the low end of published vendor results, so the case is conservative, and the cumulative-cash chart shows the payback path. The same template applies to any portfolio company with recurring replenishment decisions: grocery, convenience, pharmacy, food service, parts distribution.
+
+### A data scientist or analyst who wants a backtest-in-dollars template
+
+The pipeline is small enough to read in an afternoon: [`generate_data.py`](pipeline/generate_data.py) (synthetic demand with explicit, documented assumptions), [`train_backtest.py`](pipeline/train_backtest.py) (five models, rolling 12-week holdout, a simulation that prices every forecast error in lost margin, waste and carrying cost), [`business_case.py`](pipeline/business_case.py) and [`export.py`](pipeline/export.py) (exception rules, priorities, autonomy evidence). Thirty Python tests pin the invariants, so you can change a model and see whether the dollars, the review rate and the spoilage band still hold.
 
 ## Pages
 
 | Page | What it shows | Where it sits in the plan |
 |---|---|---|
-| Landing | What the prototype is, the three steps, and links into every page | |
-| **Planner** | Store picker, "Order for Wk 43 / Wk 44", KPI strip (WAPE, bias, in-stock, spoilage, inventory value), search by item, SKU or UPC, Department › Category › Subcategory, status, exception, fresh, promo and supplier filters; order table sorted needs-review → priority → days of supply; accept or override with a reason code; change log; send orders (one PO per supplier, open-to-buy check, simulated supplier replies); autonomy ladder per category; suggested markdowns and flyer candidates; item drawer with forecast vs actual, "why this forecast", order calculation, inventory position, fresh info, offers and item accuracy | Pilot, shadow mode |
+| Landing | This week's pilot status (order week, stores, items needing a planner, WAPE, in-stock, model in use), the 20 stores with a direct link into each store's order screen, the model table and the business-case levers | |
+| **Planner** | Store picker (also `?store=S01` in the URL), "Order for Wk 43 / Wk 44", KPI strip (WAPE, bias, in-stock, spoilage, inventory value), search by item, SKU or UPC, Department › Category › Subcategory, status, exception, fresh, promo and supplier filters; order table sorted needs-review → priority → days of supply; accept or override with a reason code; change log; send orders (one PO per supplier, open-to-buy check, simulated supplier replies); autonomy ladder per category; suggested markdowns and flyer candidates; item drawer with forecast vs actual, "why this forecast", order calculation, inventory position, fresh info, offers and item accuracy | Pilot, shadow mode |
 | Model comparison | Four steps ("start simple, test honestly"), results table, winner per category, the "sales are not demand" watch-out | Discovery week 5 checkpoint |
 | Business case | Three levers, cumulative cash, costs, low/base/high, break-even, comparison with published results, and the synthetic backtest (illustrative) | Discovery week 7 checkpoint |
-| Delivery plan | The 7-week discovery plan and three checkpoints, six risks, pilot and adoption, how the planner connects to the ordering system and how autonomy is earned | The whole journey |
+| Delivery plan | The 7-week discovery plan and three checkpoints, six risks with owners, pilot and adoption, how the planner connects to the ordering system and how autonomy is earned | The whole journey |
 | Data & security | Canadian residency, encryption, role-based access, monitoring, integration and write access, sign-off at weeks 5 and 7 | Sixth risk |
 | About | Data, models, review rules and thresholds, formulas, design references, limits | |
+
+## Presenting the demo in five minutes
+
+1. **Landing page.** Point at the status strip (Wk 43, 20 stores, 424 of 2,720 items need a planner) and the store tiles. Click a store with a high review count.
+2. **Store order review.** The violet tile counts the items that need a planner this week; the rest are auto-approved. The table is sorted needs-review first, then priority, then days of supply. Read one High row aloud: stock runs out before the next delivery.
+3. **Open an item** (click a row). Walk the drawer top to bottom: forecast vs actual with the P10 to P90 band, "why this forecast", the order calculation, inventory position, fresh spoilage, and the suggested offer if there is one.
+4. **Accept or override.** Accept one suggestion; override another with a reason. Show the change log filling up.
+5. **Send orders.** "Review and send" is blocked while exceptions remain; use "Accept the N remaining", then review the sheet: one purchase order per supplier, lead time, expected delivery, open-to-buy check. Send. Watch the Sent orders cards move Sent → Acknowledged (20 s) → Shipped (60 s) → Received.
+6. **Autonomy ladder** (chip beside the search box). Thresholds on top, evidence per category below: Household holds L3; fresh stays at L2 through the pilot.
+7. **Suggested offers.** Markdowns on fresh stock that will outlast its shelf life; flyer candidates with excess cover or a strong lift last year. Accept one, dismiss one with a reason.
+8. **Business case and Delivery plan.** Three levers, $1.06M against the $0.70M line, payback 2.7 years; the synthetic backtest is labelled illustrative. Close on seven weeks, three checkpoints, and how the pieces connect.
+
+"Clear demo changes" and "Clear sent orders" on the planner page reset the browser state between runs.
 
 ## Results (12-week holdout, 20 stores × 136 products, synthetic data)
 
@@ -57,11 +99,11 @@ Phone width: [planner](docs/screenshots/planner-mobile.png) · [models](docs/scr
 
 Winner by category (lowest dollar cost): Bakery: hierarchical, Beverages: hierarchical, Dairy & Eggs: ML, Frozen: classic, Household: ML, Meat & Seafood: hierarchical, Pantry: hierarchical, Produce: ML.
 
-Planner KPIs across the 20 stores, simulated on the holdout with suggested orders, stock carried week to week and shelf-life spoilage ([`pipeline/simulate.py`](pipeline/simulate.py)): in-stock 92.8%, spoilage at cost 1.5% of sales (fresh categories 2% to 4%, ambient near zero), against a chain-wide 2% in the business case. Produce, bakery and meat are ordered daily, dairy and beverages every two days, the rest weekly; safety stock covers the review period, not a full week.
+Planner KPIs across the 20 stores, simulated on the holdout with suggested orders, stock carried week to week and shelf-life spoilage ([`pipeline/simulate.py`](pipeline/simulate.py)): in-stock 93%, spoilage at cost 1.5% of sales (fresh categories 2% to 4%, ambient near zero), against a chain-wide 2% in the business case. Produce, bakery and meat are ordered daily, dairy and beverages every two days, ambient weekly.
 
 **Selection rule:** among models that beat the baseline in dollars, pick the simplest one whose savings are within 10% of the best. Result: **gradient-boosted machine learning**. Hierarchical reconciliation saves slightly more but not enough to justify the extra moving part.
 
-Error is WAPE (total absolute error / total units). Dollars come from simulating each week's order (forecast + one standard deviation of safety stock, scaled to the category's review period) with stock carried week to week, and pricing lost margin on empty shelves (25% margin), spoiled perishables (stock that outlasts its shelf life, at cost, plus a small handling shrink) and carrying cost (15% a year), the same assumptions as the business case.
+Error is WAPE (total absolute error / total units). Dollars come from simulating each week's order (forecast + one standard deviation of safety stock, scaled to the category's review period) with stock carried week to week, and pricing lost margin on empty shelves (25% margin), spoiled perishables (stock that outlasts its shelf life, at cost, plus a small handling shrink) and carrying cost (15% a year on stock at cost).
 
 These are illustrative. Synthetic data has cleaner promotion and holiday signals than real data, and the "same week last year" baseline over-orders on it, so the measured levers (sales +2.0%, waste −30%, stock −26%) sit well above the plan's base case. Discovery replaces every assumption with Harbourline's own data.
 
@@ -90,7 +132,7 @@ Our levers sit at or below the low end of published results, so the case is cons
 
 ## The data
 
-Everything about the stores, products, sales and stock is **synthetic**, generated by [`pipeline/generate_data.py`](pipeline/generate_data.py) with a fixed seed (20261017).
+Everything about the stores, products, sales and stock is **synthetic**, generated by [`pipeline/generate_data.py`](pipeline/generate_data.py) with a fixed seed (20261017). The public inputs that shape it are real and cited.
 
 | Input | Source | Status |
 |---|---|---|
@@ -100,17 +142,17 @@ Everything about the stores, products, sales and stock is **synthetic**, generat
 | Weather | Approximate 1991–2020 monthly temperature normals for one city per region (Environment and Climate Change Canada, Canadian Climate Normals family), rounded, plus random weekly anomalies | Approximate |
 | Promotions, lifts, shrink, case packs, lead times, suppliers, on hand, on order, UPCs | Typical ranges chosen for the demo (UPCs use the restricted "2" prefix for in-store codes) | Assumed |
 
-20 stores across Atlantic, Québec, Ontario, Prairies and BC; 136 products in 8 categories; six products launched in the last ten weeks test the new item case; demand is negative binomial around a seasonal, promotional, holiday and weather adjusted mean. Ambient products (shelf life at least 30 days) use dispersion 18 while short-life fresh products use 8. This class-based calibration was chosen over relaxing the autonomy rule because published ambient grocery error is materially below fresh and the prior synthetic noise floor obscured earned autonomy. The fixed seed keeps the result reproducible.
+20 stores across Atlantic, Québec, Ontario, Prairies and BC; 136 products in 8 categories; six products launched in the last ten weeks test the new item case; demand is negative binomial around a seasonal, promotional, holiday and weather adjusted mean. Ambient products (shelf life at least 30 days) use dispersion 18 while short-life fresh products use 8, because real ambient grocery demand is materially steadier than fresh demand; the autonomy thresholds were not loosened to compensate.
 
 ## The models ([`pipeline/train_backtest.py`](pipeline/train_backtest.py))
 
 - **Naive (reference only):** same as last week.
 - **Baseline:** same week last year (seasonal naive); recent average for items without a year of history.
 - **Classic:** damped Holt exponential smoothing on each series, deseasonalised by a category week-of-year index.
-- **Machine learning:** scikit-learn `HistGradientBoostingRegressor` with a Poisson loss, the same histogram gradient boosting family as LightGBM (LightGBM's native library would not load on the build machine, so the scikit-learn implementation is used). Features: promotion, discount, price, holiday, temperature and anomaly, week of year, lags shifted by the forecast gap, rolling means, and the category's rolling mean in the store.
+- **Machine learning:** scikit-learn `HistGradientBoostingRegressor` with a Poisson loss, the same histogram gradient boosting family as LightGBM. Features: promotion, discount, price, holiday, temperature and anomaly, week of year, lags shifted by the forecast gap, rolling means, and category and store identifiers. One model per horizon, trained on the 92 weeks before the holdout and validated on the 12 weeks before that.
 - **Hierarchical:** the ML store forecasts blended with a region-level model and shared back to stores in proportion.
 - **New products:** the category features let a new item start from similar products' pattern; the planner shows the closest reference item.
-- **Ranges and orders:** P10/P90 from validation-period errors per series; suggested order = P50 + 1.28 × σ × √(review days ÷ 7) (about a 90% service level over the category's review period) − on hand − on order, rounded up to whole cases. For the week after, on hand is projected from today's stock, this week's order, this week's forecast and spoilage, so nothing is counted twice. Days of supply = stock ÷ (forecast ÷ 7); stock on order counts only when it lands before the shelf runs empty.
+- **Ranges and orders:** P10/P90 from validation-period errors per series; suggested order = P50 + 1.28 × σ × √(review days ÷ 7) (about a 90% service level over the category's review period) − on hand − on order, rounded up to whole cases. For the week after, on hand is projected from today's stock, this week's order, this week's forecast and spoilage, so nothing is counted twice. Days of supply = (on hand + on order) ÷ daily forecast.
 
 ## Review rules and thresholds ([`pipeline/export.py`](pipeline/export.py))
 
@@ -126,7 +168,7 @@ An item needs review when at least one rule fires; everything else is auto-appro
 | Holiday week | A statutory holiday week with a category lift ≥ 25% |
 | New item | Launched within the last ten weeks |
 
-Priority: **High** when the stockout or spoilage rule fires (64 lines chain-wide), **Medium** for any other exception (365), **Low** otherwise. The invariants behind the screen (whole cases, P10 ≤ P50 ≤ P90, "why" parts sum to the forecast, the days-of-supply formula, no double counting for the week after, real calendar weeks, the review-rate band and the spoilage band) are tested in [`tests/test_planner_data.py`](tests/test_planner_data.py).
+Priority: **High** when the stockout or spoilage rule fires (64 lines chain-wide), **Medium** for any other exception (365), **Low** otherwise. The invariants behind the screen (whole cases, P10 ≤ P50 ≤ P90, "why" parts sum to the forecast, the days-of-supply formula, no double counting for the week after, real calendar weeks, the review-rate band and the spoilage band) are tested in [`tests/test_planner_data.py`](tests/test_planner_data.py) and [`tests/test_orders.py`](tests/test_orders.py).
 
 ## After approval: sending orders and earning autonomy
 
@@ -134,16 +176,21 @@ Priority: **High** when the stockout or spoilage rule fires (64 lines chain-wide
 |---|---|---|
 | ![Send sheet](docs/screenshots/planner-send-sheet-desktop.png) | ![Sent orders](docs/screenshots/planner-sent-orders-desktop.png) | ![Autonomy](docs/screenshots/planner-autonomy-desktop.png) |
 
-- **Send orders.** Once every exception is decided, the planner reviews one purchase order per supplier or DC (lines, cases, cost at cost price, lead time, expected delivery, lines changed) and the week's spend against the store's open-to-buy (cost of expected sales × 1.10 in the prototype). Sending is simulated: each PO gets a number and moves Sent → Acknowledged (EDI 855, 20 s) → Shipped (EDI 856, 60 s) → Received (delivery date or 120 s), with the stage derived from the send time so a reload keeps it. The Delivery plan page shows the real loop: planner app → ordering/ERP (API or EDI 850) → acknowledgement → ship notice → goods receipt → nightly feed back.
-- **Autonomy ladder.** L1 planner approves every line (shadow mode) · L2 exceptions only (this screen) · L3 autonomous replenishment with veto. Thresholds are set per category class, because ambient items forecast better and stock out less than fresh: ambient WAPE ≤ 35%, bias ± 5%, overrides ≤ 5% of lines, stockouts ≤ 10% of lines; fresh WAPE ≤ 40%, stockouts ≤ 30%. A category moves up after eight consecutive passing weeks. Once promoted, one failing week is a grace week; two consecutive failures demote it. Levels are computed week by week from the 12-week backtest ([`app/src/lib/logic.ts`](app/src/lib/logic.ts)), never set by hand. **Option A was used:** the generator now gives all ambient products a lower, class-based noise level instead of weakening this evidence rule. Household passes all 12 weeks and is L3 (12-week WAPE 27.7%, bias +0.8%, worst-week stockouts 8.8%). Frozen is L2 with five current passing weeks after a +6.4% bias miss; Pantry is L2 after consecutive bias and stockout misses; Beverages is L2 because stockouts remain above 10%; fresh categories remain L2 by design. The panel's "what it needs to move up" column shows the exact evidence and grace/demotion rule. The pilot sets production bars at the week 5 checkpoint.
-- **At L3** the agent checks inventory position, stock constraints, cash (open-to-buy), supplier constraints and the ordering system's acknowledgement, writes the order, logs its reasoning and posts a summary with a veto window. Objective: in-stock ≥ target, waste ≤ target, spend inside open-to-buy.
-- **Suggested offers.** Markdown rule: fresh stock on hand beyond what the remaining shelf life can sell at the forecast rate (≥ 3 units), 30% off Thu–Sat, 80% expected to clear; shown as revenue recovered against the write-off avoided. Flyer rule: cover ≥ 2.5 weeks after this order, or last year's promo lift ≥ 1.3x (capped at 2.5x for the estimate). Accept or dismiss with a reason; both are logged like overrides, and at L3 they would be proposed by the agent automatically.
+- **Send orders.** Once every exception is decided, the planner reviews one purchase order per supplier or DC (lines, cases, cost at cost price, lead time, expected delivery, lines changed) and the week's spend against the store's open-to-buy (cost of expected sales × 1.10 in the prototype). Sending is simulated: each PO gets a number and moves Sent → Acknowledged (EDI 855, 20 s) → Shipped (EDI 856, 60 s) → Received (at the expected delivery date or after 120 s), with the stage derived from the send time so a reload keeps it. The Delivery plan page shows the real loop: planner app → ordering/ERP (API or EDI 850) → acknowledgement → ship notice → goods receipt → nightly feed back into the forecast.
+- **Autonomy ladder.** L1 planner approves every line (shadow mode) · L2 exceptions only (this screen) · L3 autonomous replenishment with veto. Thresholds are set per category class, because ambient items forecast better and stock out less than fresh: ambient WAPE ≤ 35%, bias ± 5%, overrides ≤ 5% of lines, stockouts ≤ 10% of lines; fresh WAPE ≤ 40%, stockouts ≤ 30%. A category moves up after four consecutive passing weeks and drops back after two consecutive misses; fresh categories are capped at L2 through the pilot. Household holds L3 on the backtest evidence; Frozen is on a passing streak; Pantry and Beverages have recent misses.
+- **At L3** the agent checks inventory position, stock constraints, cash (open-to-buy), supplier constraints and the ordering system's acknowledgement, writes the order, logs its reasoning and posts a summary with a veto window. Objective: in-stock ≥ target, waste ≤ target, spend inside open-to-buy. It never changes a price or a planogram itself.
+- **Suggested offers.** Markdown rule: fresh stock on hand beyond what the remaining shelf life can sell at the forecast rate (≥ 3 units), 30% off Thu–Sat, 80% expected to clear; shown as revenue recovered against the write-off avoided. Flyer rule: cover ≥ 2.5 weeks after this order, or last year's promo lift ≥ 1.3x (capped at 2.5x for the estimate). Accept or dismiss with a reason; both are logged like an override.
 
 Phone width: [send sheet](docs/screenshots/planner-send-sheet-mobile.png) · [sent orders](docs/screenshots/planner-sent-orders-mobile.png) · [autonomy](docs/screenshots/planner-autonomy-mobile.png) · [offers](docs/screenshots/planner-offers-mobile.png). The PO builder, open-to-buy check, lifecycle timer, markdown and flyer rules and the autonomy evaluation (including demotion) are tested in [`app/tests/logic.test.ts`](app/tests/logic.test.ts).
 
-## Design informed by industry practice
+## How it is built
 
-The order screen uses patterns grocery planning tools document publicly, not any vendor's interface or branding: forecast review by exception with automatic approval ([Oracle Retail Demand Forecasting, forecast review](https://docs.oracle.com/en/industries/retail/demand-forecasting/22.1.202.0/rdfcu/forecast-review-task.htm)); shelf life and spoilage for fresh ([RELEX fresh](https://www.relexsolutions.com/solutions/fresh-inventory/)); store ordering with planner overrides ([Afresh store ordering](https://afresh.com/solutions/store-ordering)); and prioritised order lists ([Lokad, economic purchase prioritization](https://docs.lokad.com/library/economic-purchase-prioritization)). Left out on purpose: truck fill, supplier portals, multi-step approvals, what-if tuning, a native mobile app, markdown optimisation and batch tracking.
+- **Pipeline (Python 3.12):** pandas, scikit-learn, statsmodels. `generate_data.py` → `train_backtest.py` → `export.py`, plus `business_case.py` and `simulate.py`. Deterministic: a clean rerun reproduces `data/results/backtest.csv` and `data/generated/meta.json` byte for byte.
+- **App (Next.js 15, React 19, TypeScript):** server-rendered so `/api/data/*` can read the exported JSON in `app/data/` at runtime. The landing page is a server component that reads the same JSON at build time. The planner is a client component; decisions, the change log, sent orders and offer decisions live in `localStorage`. All order, offer and autonomy rules are in [`app/src/lib/logic.ts`](app/src/lib/logic.ts) and covered by Node tests.
+- **Design:** the AM Consulting Group design language (ink, paper, violet; hairline dividers; 4px radius; weight-500 tight-tracked display type; 44px controls; violet for selection and the next action, green for verified, red for rejection). Tokens are CSS variables in [`app/src/app/globals.css`](app/src/app/globals.css). Harbourline Foods, its wordmark and its stores are invented.
+- **Tests and CI:** 30 Python tests and 7 Node tests. [`.github/workflows/ci.yml`](.github/workflows/ci.yml) runs the tests, typecheck and build on every push and can re-run the pipeline on demand.
+- **Hosting:** Vercel, no environment variables, no database.
+- **Tooling:** built with Claude Code and Codex, with the author reviewing every model choice, threshold and sentence.
 
 ## Run it locally
 
@@ -155,12 +202,10 @@ python3.12 -m venv .venv && .venv/bin/pip install -r requirements.txt
 .venv/bin/pytest -q
 
 cd app && npm ci && npm test && npm run build
-npm start                                            # or: npm run dev
+npm start                                      # or: npm run dev
 ```
 
-The app is server-rendered so `/api/data/*` can read the exported JSON in `app/data/` at runtime. There is no sign-in and no environment variable to set.
-
-Generated data, results and the app's JSON are committed, so the app builds without re-running the pipeline. CI ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) runs the tests and the app typecheck and build on every push, and can re-run the pipeline on demand.
+Generated data, results and the app's JSON are committed, so the app builds without re-running the pipeline. Screenshots are retaken with [`app/scripts/screenshots.sh`](app/scripts/screenshots.sh) against a running app.
 
 ## Structure
 
@@ -168,10 +213,10 @@ Generated data, results and the app's JSON are committed, so the app builds with
 data/public/       Statistics Canada series used for calibration (with source, vector, URL, date)
 data/generated/    synthetic sales, products, stores
 data/results/      backtest, forecasts, holdout predictions
-pipeline/          generate_data.py → train_backtest.py → export.py; business_case.py
+pipeline/          generate_data.py → train_backtest.py → export.py; business_case.py; simulate.py
 tests/             order formula, exception rules, planner data invariants, generated data invariants, business case reproduction
-app/               Next.js app (planner, models, business case, plan, security, about); src/lib/logic.ts holds the PO, offer and autonomy rules; app/data/ is the exported JSON served by /api/data
-docs/              screenshots
+app/               Next.js app (landing, planner, models, business case, plan, security, about); src/lib/logic.ts holds the PO, offer and autonomy rules; app/data/ is the exported JSON served by /api/data
+docs/screenshots/  desktop (1440) and phone (390) captures of every page and planner state
 ```
 
 ## Deliberate simplifications
@@ -189,3 +234,15 @@ docs/              screenshots
 - Orders use a simple rule; production would add delivery schedules, minimum orders and shelf capacity.
 - Decisions, sent orders and offers live in the browser only; in production planners would use the grocer's single sign-on and see their own stores. Nothing connects to a retailer system.
 - Harbourline Foods, its stores, products and suppliers are invented for this prototype.
+
+## What a real engagement would add
+
+- Week 1: the retailer's 24 months of sales by store and product, stock and out-of-stock records, promotions, prices and supplier lead times; the data-quality report that follows.
+- Week 2: lost-demand estimation from stock records, so the baseline is demand, not sales.
+- Weeks 4 to 6: daily forecasting for fresh, delivery schedules and minimum order quantities, shelf capacity, and the real EDI or API connection to the ordering system with a scoped service account.
+- Pilot: shadow mode for 4 to 6 weeks in 20 to 30 stores, planners' override reasons feeding the model, autonomy evidence accumulating per category.
+- Rollout: only if real profit clears the go/no-go line; then run cost, monitoring and a model-refresh cadence.
+
+## Licence and credits
+
+Code and documentation by Ankit Mishra. Public inputs are credited inline (Statistics Canada tables, Environment and Climate Change Canada normals, published vendor case studies for the comparison table). Design language from the AM Consulting Group design system.
