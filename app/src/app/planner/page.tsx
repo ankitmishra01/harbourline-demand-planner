@@ -45,6 +45,8 @@ export default function Planner() {
 
   useEffect(() => {
     loadMeta().then(setMeta);
+    // Deep link from the landing page store tiles: /planner/?store=S01
+    try { const q = new URLSearchParams(window.location.search).get("store"); if (q && /^S\d{2}$/.test(q)) setStoreId(q); } catch { /* ignore */ }
     setDecisions(store.get("decisions", {})); setLog(store.get("changelog", [])); setSent(store.get("sentorders", [])); setOfferDecisions(store.get("offers", {}));
     try { const u = localStorage.getItem("planner"); if (u) setUser(u.split("@")[0]); } catch { /* ignore */ }
   }, []);
@@ -183,7 +185,7 @@ export default function Planner() {
       <p className="lede">Every product in the store by name and code, with the forecast for Wk {wn[0]} ({fmtWeek(meta.forecast_weeks[0])}) and Wk {wn[1]} ({fmtWeek(meta.forecast_weeks[1])}) and how much to order. Items that pass every rule are auto-approved; the planner reviews the rest. Once the review is done, the orders go out as one purchase order per supplier.</p>
 
       <div className="toolbar">
-        <select value={storeId} onChange={(e) => { setStoreId(e.target.value); setOpen(null); }} aria-label="Store">
+        <select value={storeId} onChange={(e) => { setStoreId(e.target.value); setOpen(null); try { const u = new URL(window.location.href); u.searchParams.set("store", e.target.value); window.history.replaceState(null, "", u); } catch { /* ignore */ } }} aria-label="Store">
           {meta.stores.map((s) => <option key={s.store} value={s.store}>Store {s.store} – {s.name}, {s.province}</option>)}
         </select>
         <div className="seg" role="group" aria-label="Order week">
