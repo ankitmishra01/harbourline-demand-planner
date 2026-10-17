@@ -1,0 +1,18 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.DS_Store
+app/node_modules/
+app/.next/
+app/out/
+app/.vercel/
+app/tsconfig.tsbuildinfo
+.vercel/
+# Case materials stay local: never commit them.
+*.pdf
+*.pptx
+*.xlsx
+# Demo access details stay local.
+docs/DEMO_ACCESS.local.md
+.gstack/

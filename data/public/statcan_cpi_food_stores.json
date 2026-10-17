@@ -1,0 +1,152 @@
+{
+ "source": "Statistics Canada, Table 18-10-0004-01, Consumer Price Index, monthly, not seasonally adjusted: Canada, Food purchased from stores (2002=100)",
+ "vector": "v41690975",
+ "url": "https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1810000401",
+ "retrieved": "2026-10-17",
+ "data": [
+  {
+   "month": "2023-09",
+   "value": 183.1
+  },
+  {
+   "month": "2023-10",
+   "value": 182.4
+  },
+  {
+   "month": "2023-11",
+   "value": 183.9
+  },
+  {
+   "month": "2023-12",
+   "value": 184.5
+  },
+  {
+   "month": "2024-01",
+   "value": 186.0
+  },
+  {
+   "month": "2024-02",
+   "value": 185.6
+  },
+  {
+   "month": "2024-03",
+   "value": 185.1
+  },
+  {
+   "month": "2024-04",
+   "value": 184.5
+  },
+  {
+   "month": "2024-05",
+   "value": 186.5
+  },
+  {
+   "month": "2024-06",
+   "value": 187.5
+  },
+  {
+   "month": "2024-07",
+   "value": 188.0
+  },
+  {
+   "month": "2024-08",
+   "value": 187.7
+  },
+  {
+   "month": "2024-09",
+   "value": 187.5
+  },
+  {
+   "month": "2024-10",
+   "value": 187.4
+  },
+  {
+   "month": "2024-11",
+   "value": 188.6
+  },
+  {
+   "month": "2024-12",
+   "value": 188.0
+  },
+  {
+   "month": "2025-01",
+   "value": 189.5
+  },
+  {
+   "month": "2025-02",
+   "value": 190.8
+  },
+  {
+   "month": "2025-03",
+   "value": 191.0
+  },
+  {
+   "month": "2025-04",
+   "value": 191.6
+  },
+  {
+   "month": "2025-05",
+   "value": 192.7
+  },
+  {
+   "month": "2025-06",
+   "value": 192.8
+  },
+  {
+   "month": "2025-07",
+   "value": 194.4
+  },
+  {
+   "month": "2025-08",
+   "value": 194.2
+  },
+  {
+   "month": "2025-09",
+   "value": 195.0
+  },
+  {
+   "month": "2025-10",
+   "value": 193.8
+  },
+  {
+   "month": "2025-11",
+   "value": 197.4
+  },
+  {
+   "month": "2025-12",
+   "value": 197.4
+  },
+  {
+   "month": "2026-01",
+   "value": 198.6
+  },
+  {
+   "month": "2026-02",
+   "value": 198.6
+  },
+  {
+   "month": "2026-03",
+   "value": 199.4
+  },
+  {
+   "month": "2026-04",
+   "value": 198.9
+  },
+  {
+   "month": "2026-05",
+   "value": 200.9
+  },
+  {
+   "month": "2026-06",
+   "value": 200.3
+  },
+  {
+   "month": "2026-07",
+   "value": 200.5
+  },
+  {
+   "month": "2026-08",
+   "value": 199.6
+  }
+ ]
+}

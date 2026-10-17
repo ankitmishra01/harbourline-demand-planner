@@ -1,0 +1,152 @@
+{
+ "source": "Statistics Canada, Table 20-10-0056-01, Monthly retail trade sales by province and territory: Canada, Supermarkets and other grocery retailers (except convenience retailers), total retail sales, unadjusted, x 1,000 CAD",
+ "vector": "v1446859503",
+ "url": "https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=2010005601",
+ "retrieved": "2026-10-17",
+ "data": [
+  {
+   "month": "2023-08",
+   "value": 9094355.0
+  },
+  {
+   "month": "2023-09",
+   "value": 9044947.0
+  },
+  {
+   "month": "2023-10",
+   "value": 8816427.0
+  },
+  {
+   "month": "2023-11",
+   "value": 8684172.0
+  },
+  {
+   "month": "2023-12",
+   "value": 9846802.0
+  },
+  {
+   "month": "2024-01",
+   "value": 8593789.0
+  },
+  {
+   "month": "2024-02",
+   "value": 8362964.0
+  },
+  {
+   "month": "2024-03",
+   "value": 9155233.0
+  },
+  {
+   "month": "2024-04",
+   "value": 8615729.0
+  },
+  {
+   "month": "2024-05",
+   "value": 9402920.0
+  },
+  {
+   "month": "2024-06",
+   "value": 9303656.0
+  },
+  {
+   "month": "2024-07",
+   "value": 9256986.0
+  },
+  {
+   "month": "2024-08",
+   "value": 9485750.0
+  },
+  {
+   "month": "2024-09",
+   "value": 8874909.0
+  },
+  {
+   "month": "2024-10",
+   "value": 9292360.0
+  },
+  {
+   "month": "2024-11",
+   "value": 9105888.0
+  },
+  {
+   "month": "2024-12",
+   "value": 9813430.0
+  },
+  {
+   "month": "2025-01",
+   "value": 9006456.0
+  },
+  {
+   "month": "2025-02",
+   "value": 8454536.0
+  },
+  {
+   "month": "2025-03",
+   "value": 9308175.0
+  },
+  {
+   "month": "2025-04",
+   "value": 9170347.0
+  },
+  {
+   "month": "2025-05",
+   "value": 10097130.0
+  },
+  {
+   "month": "2025-06",
+   "value": 9501759.0
+  },
+  {
+   "month": "2025-07",
+   "value": 9617590.0
+  },
+  {
+   "month": "2025-08",
+   "value": 9770388.0
+  },
+  {
+   "month": "2025-09",
+   "value": 9080678.0
+  },
+  {
+   "month": "2025-10",
+   "value": 9537988.0
+  },
+  {
+   "month": "2025-11",
+   "value": 9325882.0
+  },
+  {
+   "month": "2025-12",
+   "value": 10025543.0
+  },
+  {
+   "month": "2026-01",
+   "value": 9526547.0
+  },
+  {
+   "month": "2026-02",
+   "value": 8713064.0
+  },
+  {
+   "month": "2026-03",
+   "value": 9436998.0
+  },
+  {
+   "month": "2026-04",
+   "value": 9204220.0
+  },
+  {
+   "month": "2026-05",
+   "value": 10058280.0
+  },
+  {
+   "month": "2026-06",
+   "value": 9459907.0
+  },
+  {
+   "month": "2026-07",
+   "value": 9816041.0
+  }
+ ]
+}

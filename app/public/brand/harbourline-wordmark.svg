@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="236" height="28" viewBox="0 0 236 28" role="img" aria-label="Harbourline Foods">
+  <g fill="none" stroke="#2E7D8C" stroke-width="2.4" stroke-linecap="round">
+    <circle cx="14" cy="13" r="10.5"/>
+    <path d="M6 15.5c2.6 0 2.6 2.4 5.3 2.4s2.7-2.4 5.3-2.4 2.7 2.4 5.4 2.4"/>
+    <path d="M14 3.5v8.5"/>
+  </g>
+  <text x="33" y="20.5" font-family="Inter, system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="20" font-weight="700" letter-spacing="-0.4" fill="#13262F">Harbourline<tspan font-weight="400" fill="#2E7D8C"> Foods</tspan></text>
+</svg>

@@ -1,0 +1,19 @@
+{
+ "selected": "ml",
+ "selection_rule": "Among models that beat the baseline in dollars, pick the simplest one whose savings are within 10% of the best.",
+ "holdout_weeks": [
+  "2026-07-27",
+  "2026-10-12"
+ ],
+ "validation_weeks": [
+  "2026-05-04",
+  "2026-07-20"
+ ],
+ "measured_levers": {
+  "sales_uplift": 0.018782790883650733,
+  "waste_cut": 0.26787570030975205,
+  "inv_cut": 0.25979435589371247
+ },
+ "z_order_backtest": 1.0,
+ "z_planner": 1.28
+}

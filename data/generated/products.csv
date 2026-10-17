@@ -1,0 +1,137 @@
+sku,name,base_name,category,store_brand,base_units,price,shelf_life_days,shrink_share,promo_prob,temp_sens,hol_sens,launch_weeks_ago,seasonal_peak,promo_lift_lo,promo_lift_hi
+PRO-0001,Bananas (per kg),Bananas (per kg),Produce,False,57.12985052948843,5.22,7,0.55,0.1,0.004,1.2,,False,1.25,1.6
+PRO-0002,Gala apples 3 lb,Gala apples 3 lb,Produce,False,62.33387254593916,5.81,7,0.55,0.1,0.004,1.2,,False,1.25,1.6
+PRO-0003,Romaine hearts 3 pk,Romaine hearts 3 pk,Produce,False,72.99224436539497,3.96,7,0.55,0.1,0.004,1.2,,False,1.25,1.6
+PRO-0004,Store brand Baby carrots 2 lb,Baby carrots 2 lb,Produce,True,58.120602395175325,2.57,7,0.55,0.1,0.004,1.2,,False,1.25,1.6
+PRO-0005,English cucumber,English cucumber,Produce,False,53.980176528194896,2.72,7,0.55,0.1,0.004,1.2,,False,1.25,1.6
+PRO-0006,Vine tomatoes (per kg),Vine tomatoes (per kg),Produce,False,94.22516372759267,2.75,7,0.55,0.1,0.004,1.2,,False,1.25,1.6
+PRO-0007,Russet potatoes 10 lb,Russet potatoes 10 lb,Produce,False,74.6103028635282,5.39,7,0.55,0.1,0.004,1.2,,False,1.25,1.6
+PRO-0008,Store brand Yellow onions 3 lb,Yellow onions 3 lb,Produce,True,57.625066525722616,1.45,7,0.55,0.1,0.004,1.2,,False,1.25,1.6
+PRO-0009,Avocados 4 pk,Avocados 4 pk,Produce,False,57.37419132355044,5.72,7,0.55,0.1,0.004,1.2,,False,1.25,1.6
+PRO-0010,Strawberries 454 g,Strawberries 454 g,Produce,False,30.648913142070697,5.23,7,0.55,0.1,0.004,1.2,,True,1.25,1.6
+PRO-0011,Blueberries 510 g,Blueberries 510 g,Produce,False,53.664097594419225,4.4,7,0.55,0.1,0.004,1.2,,False,1.25,1.6
+PRO-0012,Store brand Baby spinach 312 g,Baby spinach 312 g,Produce,True,38.27630039639116,4.82,7,0.55,0.1,0.004,1.2,,False,1.25,1.6
+PRO-0013,Broccoli crowns (per kg),Broccoli crowns (per kg),Produce,False,32.6839278699253,3.31,7,0.55,0.1,0.004,1.2,,False,1.25,1.6
+PRO-0014,Lemons 2 lb,Lemons 2 lb,Produce,False,41.712120938868736,2.58,7,0.55,0.1,0.004,1.2,,False,1.25,1.6
+PRO-0015,Red grapes (per kg),Red grapes (per kg),Produce,False,60.59501191589946,2.25,7,0.55,0.1,0.004,1.2,,False,1.25,1.6
+PRO-0016,Store brand Mandarins 2 lb,Mandarins 2 lb,Produce,True,71.79790735725433,2.54,7,0.55,0.1,0.004,1.2,,False,1.25,1.6
+PRO-0017,Sweet potatoes (per kg),Sweet potatoes (per kg),Produce,False,67.44812906831686,4.38,7,0.55,0.1,0.004,1.2,,False,1.25,1.6
+PRO-0018,Mushrooms 227 g,Mushrooms 227 g,Produce,False,79.3643071826774,4.05,7,0.55,0.1,0.004,1.2,,False,1.25,1.6
+PRO-0019,Bell peppers 3 pk,Bell peppers 3 pk,Produce,False,55.52296901598028,4.01,7,0.55,0.1,0.004,1.2,,False,1.25,1.6
+PRO-0020,Store brand Celery stalks,Celery stalks,Produce,True,43.31472546800896,1.56,7,0.55,0.1,0.004,1.2,,False,1.25,1.6
+DAI-0021,2% milk 4 L,2% milk 4 L,Dairy & Eggs,False,49.12061558469324,2.56,14,0.35,0.08,0.002,1.1,,False,1.2,1.45
+DAI-0022,Large eggs 12 pk,Large eggs 12 pk,Dairy & Eggs,False,103.85884364383028,7.72,14,0.35,0.08,0.002,1.1,,False,1.2,1.45
+DAI-0023,Salted butter 454 g,Salted butter 454 g,Dairy & Eggs,False,29.554504989701428,3.99,14,0.35,0.08,0.002,1.1,,False,1.2,1.45
+DAI-0024,Store brand Greek yogurt 750 g,Greek yogurt 750 g,Dairy & Eggs,True,59.11726965019061,3.23,14,0.35,0.08,0.002,1.1,,False,1.2,1.45
+DAI-0025,Old cheddar 400 g,Old cheddar 400 g,Dairy & Eggs,False,80.23154434315836,5.62,14,0.35,0.08,0.002,1.1,,False,1.2,1.45
+DAI-0026,Mozzarella 340 g,Mozzarella 340 g,Dairy & Eggs,False,60.79874076638508,7.06,14,0.35,0.08,0.002,1.1,,False,1.2,1.45
+DAI-0027,35% cream 473 ml,35% cream 473 ml,Dairy & Eggs,False,44.32076592704424,7.77,14,0.35,0.08,0.002,1.1,,False,1.2,1.45
+DAI-0028,Store brand Oat beverage 1.75 L,Oat beverage 1.75 L,Dairy & Eggs,True,55.388804350568826,5.12,14,0.35,0.08,0.002,1.1,,False,1.2,1.45
+DAI-0029,Cottage cheese 500 g,Cottage cheese 500 g,Dairy & Eggs,False,52.254998747042116,2.57,14,0.35,0.08,0.002,1.1,,False,1.2,1.45
+DAI-0030,Sour cream 500 ml,Sour cream 500 ml,Dairy & Eggs,False,33.442070546868145,6.04,14,0.35,0.08,0.002,1.1,,False,1.2,1.45
+DAI-0031,Large eggs 30 pk,Large eggs 30 pk,Dairy & Eggs,False,80.1060567565982,5.81,14,0.35,0.08,0.002,1.1,,False,1.2,1.45
+DAI-0032,Store brand Homo milk 2 L,Homo milk 2 L,Dairy & Eggs,True,51.935173241935516,5.69,14,0.35,0.08,0.002,1.1,,False,1.2,1.45
+DAI-0033,Brie wheel 200 g,Brie wheel 200 g,Dairy & Eggs,False,75.41583890307754,6.63,14,0.35,0.08,0.002,1.1,,False,1.2,1.45
+DAI-0034,Skyr vanilla 650 g,Skyr vanilla 650 g,Dairy & Eggs,False,61.13071526358605,6.22,14,0.35,0.08,0.002,1.1,9.0,False,1.2,1.45
+DAI-0035,Lactose free milk 2 L,Lactose free milk 2 L,Dairy & Eggs,False,23.942541468156794,3.95,14,0.35,0.08,0.002,1.1,,False,1.2,1.45
+DAI-0036,Store brand Parmesan grated 250 g,Parmesan grated 250 g,Dairy & Eggs,True,61.16466319569496,4.66,14,0.35,0.08,0.002,1.1,,False,1.2,1.45
+DAI-0037,Cream cheese 250 g,Cream cheese 250 g,Dairy & Eggs,False,57.66765499989822,3.35,14,0.35,0.08,0.002,1.1,,False,1.2,1.45
+DAI-0038,Kefir 1 L,Kefir 1 L,Dairy & Eggs,False,92.2748726111389,5.77,14,0.35,0.08,0.002,1.1,,False,1.2,1.45
+BAK-0039,Sourdough loaf,Sourdough loaf,Bakery,False,34.36888781352978,5.35,4,0.65,0.08,0.0,1.6,,False,1.2,1.5
+BAK-0040,Store brand Whole wheat sandwich bread,Whole wheat sandwich bread,Bakery,True,51.2827986728921,2.73,4,0.65,0.08,0.0,1.6,,False,1.2,1.5
+BAK-0041,Croissants 6 pk,Croissants 6 pk,Bakery,False,43.66635487286993,5.66,4,0.65,0.08,0.0,1.6,,False,1.2,1.5
+BAK-0042,Bagels 6 pk,Bagels 6 pk,Bakery,False,63.20857645945119,7.01,4,0.65,0.08,0.0,1.6,,False,1.2,1.5
+BAK-0043,Hamburger buns 8 pk,Hamburger buns 8 pk,Bakery,False,32.06506154604095,7.45,4,0.65,0.08,0.0,1.6,,False,1.2,1.5
+BAK-0044,Store brand Baguette,Baguette,Bakery,True,51.732093776365474,3.74,4,0.65,0.08,0.0,1.6,,False,1.2,1.5
+BAK-0045,Cinnamon rolls 6 pk,Cinnamon rolls 6 pk,Bakery,False,22.229171910165384,4.36,4,0.65,0.08,0.0,1.6,,False,1.2,1.5
+BAK-0046,Pumpkin pie 8 in,Pumpkin pie 8 in,Bakery,False,44.4200572858633,5.49,4,0.65,0.08,0.0,1.6,,True,1.2,1.5
+BAK-0047,Dinner rolls 12 pk,Dinner rolls 12 pk,Bakery,False,49.06623506392424,4.18,4,0.65,0.08,0.0,1.6,,False,1.2,1.5
+BAK-0048,Store brand Multigrain loaf,Multigrain loaf,Bakery,True,18.566978129498256,5.67,4,0.65,0.08,0.0,1.6,,False,1.2,1.5
+BAK-0049,Muffins 6 pk,Muffins 6 pk,Bakery,False,60.55705651430101,4.94,4,0.65,0.08,0.0,1.6,,False,1.2,1.5
+BAK-0050,Tortillas 10 pk,Tortillas 10 pk,Bakery,False,25.214714850376502,5.74,4,0.65,0.08,0.0,1.6,,False,1.2,1.5
+BAK-0051,Apple pie 8 in,Apple pie 8 in,Bakery,False,59.58800317062058,7.06,4,0.65,0.08,0.0,1.6,,False,1.2,1.5
+BAK-0052,Store brand Rye bread,Rye bread,Bakery,True,21.22565425735492,3.58,4,0.65,0.08,0.0,1.6,,False,1.2,1.5
+BAK-0053,Brioche loaf,Brioche loaf,Bakery,False,64.41946434169247,5.33,4,0.65,0.08,0.0,1.6,5.0,False,1.2,1.5
+MEA-0054,Chicken breasts (per kg),Chicken breasts (per kg),Meat & Seafood,False,39.07785164093447,9.39,5,0.5,0.1,0.003,1.8,,False,1.3,1.7
+MEA-0055,Lean ground beef 1 lb,Lean ground beef 1 lb,Meat & Seafood,False,22.635621768403738,12.9,5,0.5,0.1,0.003,1.8,,False,1.3,1.7
+MEA-0056,Store brand Pork loin chops (per kg),Pork loin chops (per kg),Meat & Seafood,True,20.39100207951064,17.44,5,0.5,0.1,0.003,1.8,,False,1.3,1.7
+MEA-0057,Atlantic salmon fillet,Atlantic salmon fillet,Meat & Seafood,False,28.766487882008935,21.88,5,0.5,0.1,0.003,1.8,,False,1.3,1.7
+MEA-0058,Whole turkey (per kg),Whole turkey (per kg),Meat & Seafood,False,14.715506760770678,17.2,5,0.5,0.1,0.003,1.8,,True,1.3,1.7
+MEA-0059,Bacon 375 g,Bacon 375 g,Meat & Seafood,False,45.46968658536736,13.83,5,0.5,0.1,0.003,1.8,,False,1.3,1.7
+MEA-0060,Store brand Chicken thighs (per kg),Chicken thighs (per kg),Meat & Seafood,True,42.59773950555146,5.38,5,0.5,0.1,0.003,1.8,,False,1.3,1.7
+MEA-0061,Striploin steak (per kg),Striploin steak (per kg),Meat & Seafood,False,42.43912448046821,6.96,5,0.5,0.1,0.003,1.8,,False,1.3,1.7
+MEA-0062,Pork sausages 500 g,Pork sausages 500 g,Meat & Seafood,False,37.229485909625645,15.75,5,0.5,0.1,0.003,1.8,,False,1.3,1.7
+MEA-0063,Shrimp 31/40 340 g,Shrimp 31/40 340 g,Meat & Seafood,False,50.294189876215285,8.99,5,0.5,0.1,0.003,1.8,,False,1.3,1.7
+MEA-0064,"Store brand Ham, spiral cut (per kg)","Ham, spiral cut (per kg)",Meat & Seafood,True,24.573086452045846,14.45,5,0.5,0.1,0.003,1.8,,True,1.3,1.7
+MEA-0065,Ground turkey 1 lb,Ground turkey 1 lb,Meat & Seafood,False,24.71815802710784,11.76,5,0.5,0.1,0.003,1.8,,False,1.3,1.7
+MEA-0066,Rotisserie chicken,Rotisserie chicken,Meat & Seafood,False,24.29695101546938,19.15,5,0.5,0.1,0.003,1.8,,False,1.3,1.7
+MEA-0067,Beef stewing cubes (per kg),Beef stewing cubes (per kg),Meat & Seafood,False,21.890323651624367,11.49,5,0.5,0.1,0.003,1.8,,False,1.3,1.7
+MEA-0068,Store brand Lamb chops (per kg),Lamb chops (per kg),Meat & Seafood,True,39.29029265210296,15.95,5,0.5,0.1,0.003,1.8,,False,1.3,1.7
+MEA-0069,Tilapia fillets 400 g,Tilapia fillets 400 g,Meat & Seafood,False,45.58199724284549,14.93,5,0.5,0.1,0.003,1.8,,False,1.3,1.7
+FRO-0070,Frozen pizza deluxe,Frozen pizza deluxe,Frozen,False,14.067502423379578,6.7,180,0.03,0.09,0.01,1.0,,False,1.25,1.55
+FRO-0071,Vanilla ice cream 1.5 L,Vanilla ice cream 1.5 L,Frozen,False,39.23334812374611,7.57,180,0.03,0.09,0.01,1.0,,False,1.25,1.55
+FRO-0072,Store brand Frozen peas 750 g,Frozen peas 750 g,Frozen,True,14.132797647248179,8.35,180,0.03,0.09,0.01,1.0,,False,1.25,1.55
+FRO-0073,Frozen berries 600 g,Frozen berries 600 g,Frozen,False,33.88983746532608,10.86,180,0.03,0.09,0.01,1.0,,False,1.25,1.55
+FRO-0074,French fries 1 kg,French fries 1 kg,Frozen,False,41.22983979024417,8.13,180,0.03,0.09,0.01,1.0,,False,1.25,1.55
+FRO-0075,Chicken nuggets 800 g,Chicken nuggets 800 g,Frozen,False,41.21276688569417,4.36,180,0.03,0.09,0.01,1.0,,False,1.25,1.55
+FRO-0076,Store brand Perogies 907 g,Perogies 907 g,Frozen,True,25.8451269879016,8.07,180,0.03,0.09,0.01,1.0,,False,1.25,1.55
+FRO-0077,Frozen lasagna 1 kg,Frozen lasagna 1 kg,Frozen,False,23.399397462341028,5.5,180,0.03,0.09,0.01,1.0,,False,1.25,1.55
+FRO-0078,Ice cream sandwiches 6 pk,Ice cream sandwiches 6 pk,Frozen,False,34.77851519996826,4.55,180,0.03,0.09,0.01,1.0,,False,1.25,1.55
+FRO-0079,Frozen vegetables mix 750 g,Frozen vegetables mix 750 g,Frozen,False,29.1582624572629,7.34,180,0.03,0.09,0.01,1.0,,False,1.25,1.55
+FRO-0080,Store brand Waffles 12 pk,Waffles 12 pk,Frozen,True,24.16796746404327,5.93,180,0.03,0.09,0.01,1.0,,False,1.25,1.55
+FRO-0081,Fish sticks 700 g,Fish sticks 700 g,Frozen,False,28.49100268630405,10.57,180,0.03,0.09,0.01,1.0,,False,1.25,1.55
+FRO-0082,Frozen dumplings 600 g,Frozen dumplings 600 g,Frozen,False,22.860697428742224,6.92,180,0.03,0.09,0.01,1.0,10.0,False,1.25,1.55
+FRO-0083,Popsicles 12 pk,Popsicles 12 pk,Frozen,False,24.428878369040838,4.72,180,0.03,0.09,0.01,1.0,,True,1.25,1.55
+FRO-0084,Store brand Frozen mango 600 g,Frozen mango 600 g,Frozen,True,16.236581099185056,5.98,180,0.03,0.09,0.01,1.0,,False,1.25,1.55
+FRO-0085,Veggie burgers 4 pk,Veggie burgers 4 pk,Frozen,False,33.59553678742199,3.62,180,0.03,0.09,0.01,1.0,6.0,False,1.25,1.55
+FRO-0086,Hash browns 1 kg,Hash browns 1 kg,Frozen,False,20.77469232850055,6.5,180,0.03,0.09,0.01,1.0,,False,1.25,1.55
+PAN-0087,Spaghetti 900 g,Spaghetti 900 g,Pantry,False,65.16504405582171,3.28,365,0.01,0.07,-0.003,1.2,,False,1.2,1.5
+PAN-0088,Store brand Basmati rice 2 kg,Basmati rice 2 kg,Pantry,True,42.64391748308585,4.02,365,0.01,0.07,-0.003,1.2,,False,1.2,1.5
+PAN-0089,Canned tomatoes 796 ml,Canned tomatoes 796 ml,Pantry,False,20.779927261222078,6.88,365,0.01,0.07,-0.003,1.2,,False,1.2,1.5
+PAN-0090,Peanut butter 1 kg,Peanut butter 1 kg,Pantry,False,28.090384490862935,2.27,365,0.01,0.07,-0.003,1.2,,False,1.2,1.5
+PAN-0091,Canola oil 3 L,Canola oil 3 L,Pantry,False,22.600657105842235,2.42,365,0.01,0.07,-0.003,1.2,,False,1.2,1.5
+PAN-0092,Store brand Maple syrup 540 ml,Maple syrup 540 ml,Pantry,True,20.07176694162757,3.57,365,0.01,0.07,-0.003,1.2,,False,1.2,1.5
+PAN-0093,Chicken noodle soup 284 ml,Chicken noodle soup 284 ml,Pantry,False,44.644167561973006,8.72,365,0.01,0.07,-0.003,1.2,,False,1.2,1.5
+PAN-0094,Oats 1 kg,Oats 1 kg,Pantry,False,34.65369296485275,8.68,365,0.01,0.07,-0.003,1.2,,False,1.2,1.5
+PAN-0095,All purpose flour 2.5 kg,All purpose flour 2.5 kg,Pantry,False,27.291190503344485,2.89,365,0.01,0.07,-0.003,1.2,,False,1.2,1.5
+PAN-0096,Store brand Granulated sugar 2 kg,Granulated sugar 2 kg,Pantry,True,25.76010122577569,4.85,365,0.01,0.07,-0.003,1.2,,False,1.2,1.5
+PAN-0097,Black beans 540 ml,Black beans 540 ml,Pantry,False,52.7874165420719,7.13,365,0.01,0.07,-0.003,1.2,,False,1.2,1.5
+PAN-0098,"Coffee, medium roast 925 g","Coffee, medium roast 925 g",Pantry,False,37.08948724804503,5.32,365,0.01,0.07,-0.003,1.2,,False,1.2,1.5
+PAN-0099,"Tea, orange pekoe 72 pk","Tea, orange pekoe 72 pk",Pantry,False,32.05160114157634,2.32,365,0.01,0.07,-0.003,1.2,,False,1.2,1.5
+PAN-0100,Store brand Breakfast cereal 525 g,Breakfast cereal 525 g,Pantry,True,51.15130604806754,4.58,365,0.01,0.07,-0.003,1.2,,False,1.2,1.5
+PAN-0101,Pasta sauce 650 ml,Pasta sauce 650 ml,Pantry,False,42.13329299001197,4.99,365,0.01,0.07,-0.003,1.2,,False,1.2,1.5
+PAN-0102,Crackers 200 g,Crackers 200 g,Pantry,False,46.43648140098872,8.71,365,0.01,0.07,-0.003,1.2,,False,1.2,1.5
+PAN-0103,"Tuna, chunk light 170 g","Tuna, chunk light 170 g",Pantry,False,68.56667670830467,5.09,365,0.01,0.07,-0.003,1.2,,False,1.2,1.5
+PAN-0104,Store brand Granola bars 6 pk,Granola bars 6 pk,Pantry,True,59.88389558150988,4.57,365,0.01,0.07,-0.003,1.2,,False,1.2,1.5
+PAN-0105,Mac and cheese 225 g,Mac and cheese 225 g,Pantry,False,25.55057118355713,3.58,365,0.01,0.07,-0.003,1.2,,False,1.2,1.5
+PAN-0106,Ketchup 1 L,Ketchup 1 L,Pantry,False,21.812667988882726,1.59,365,0.01,0.07,-0.003,1.2,,False,1.2,1.5
+PAN-0107,Stuffing mix 170 g,Stuffing mix 170 g,Pantry,False,15.591567432395282,7.15,365,0.01,0.07,-0.003,1.2,,True,1.2,1.5
+PAN-0108,Store brand Cranberry sauce 348 ml,Cranberry sauce 348 ml,Pantry,True,29.450772240029856,6.17,365,0.01,0.07,-0.003,1.2,,True,1.2,1.5
+BEV-0109,Sparkling water 12 pk,Sparkling water 12 pk,Beverages,False,61.033909173851185,7.18,270,0.01,0.1,0.015,1.3,,False,1.25,1.65
+BEV-0110,Orange juice 2.63 L,Orange juice 2.63 L,Beverages,False,103.25364110348643,8.52,270,0.01,0.1,0.015,1.3,,False,1.25,1.65
+BEV-0111,Cola 12 pk,Cola 12 pk,Beverages,False,30.567665927529227,4.44,270,0.01,0.1,0.015,1.3,,False,1.25,1.65
+BEV-0112,Store brand Spring water 24 pk,Spring water 24 pk,Beverages,True,33.42515778910876,3.95,270,0.01,0.1,0.015,1.3,,False,1.25,1.65
+BEV-0113,Iced tea 1.75 L,Iced tea 1.75 L,Beverages,False,36.74988397379435,4.1,270,0.01,0.1,0.015,1.3,,False,1.25,1.65
+BEV-0114,Sports drink 6 pk,Sports drink 6 pk,Beverages,False,30.300211870223052,3.21,270,0.01,0.1,0.015,1.3,,False,1.25,1.65
+BEV-0115,Apple juice 1.89 L,Apple juice 1.89 L,Beverages,False,29.093105321253734,5.49,270,0.01,0.1,0.015,1.3,,False,1.25,1.65
+BEV-0116,Store brand Ginger ale 12 pk,Ginger ale 12 pk,Beverages,True,64.81976743465437,1.74,270,0.01,0.1,0.015,1.3,,False,1.25,1.65
+BEV-0117,Cold brew coffee 1 L,Cold brew coffee 1 L,Beverages,False,81.86526888904021,1.82,270,0.01,0.1,0.015,1.3,8.0,False,1.25,1.65
+BEV-0118,Kombucha 414 ml,Kombucha 414 ml,Beverages,False,55.81333730856062,7.54,270,0.01,0.1,0.015,1.3,7.0,False,1.25,1.65
+BEV-0119,Lemonade 1.75 L,Lemonade 1.75 L,Beverages,False,53.658843704531485,9.18,270,0.01,0.1,0.015,1.3,,False,1.25,1.65
+BEV-0120,Store brand Energy drink 4 pk,Energy drink 4 pk,Beverages,True,53.53151082839309,7.08,270,0.01,0.1,0.015,1.3,,False,1.25,1.65
+BEV-0121,Coconut water 1 L,Coconut water 1 L,Beverages,False,29.95452795274283,5.27,270,0.01,0.1,0.015,1.3,,False,1.25,1.65
+BEV-0122,Tomato juice 1.36 L,Tomato juice 1.36 L,Beverages,False,24.886329099422536,5.52,270,0.01,0.1,0.015,1.3,,False,1.25,1.65
+BEV-0123,Hot chocolate mix 450 g,Hot chocolate mix 450 g,Beverages,False,75.88109022372221,5.06,270,0.01,0.1,0.015,1.3,,True,1.25,1.65
+BEV-0124,Store brand Sparkling juice 750 ml,Sparkling juice 750 ml,Beverages,True,34.05460041005337,7.2,270,0.01,0.1,0.015,1.3,,False,1.25,1.65
+HOU-0125,Paper towels 6 rolls,Paper towels 6 rolls,Household,False,7.411974604313488,9.99,720,0.0,0.06,0.0,1.0,,False,1.2,1.45
+HOU-0126,Bathroom tissue 12 rolls,Bathroom tissue 12 rolls,Household,False,13.991849512860554,10.39,720,0.0,0.06,0.0,1.0,,False,1.2,1.45
+HOU-0127,Dish soap 709 ml,Dish soap 709 ml,Household,False,15.970248589875277,13.43,720,0.0,0.06,0.0,1.0,,False,1.2,1.45
+HOU-0128,Store brand Laundry detergent 2.95 L,Laundry detergent 2.95 L,Household,True,8.945289296560333,10.37,720,0.0,0.06,0.0,1.0,,False,1.2,1.45
+HOU-0129,Garbage bags 40 pk,Garbage bags 40 pk,Household,False,27.656963467825136,6.74,720,0.0,0.06,0.0,1.0,,False,1.2,1.45
+HOU-0130,Aluminum foil 25 m,Aluminum foil 25 m,Household,False,22.247632694933692,10.53,720,0.0,0.06,0.0,1.0,,False,1.2,1.45
+HOU-0131,Dishwasher pods 40 pk,Dishwasher pods 40 pk,Household,False,18.693121900794736,8.95,720,0.0,0.06,0.0,1.0,,False,1.2,1.45
+HOU-0132,Store brand All purpose cleaner 950 ml,All purpose cleaner 950 ml,Household,True,8.193810352411157,4.44,720,0.0,0.06,0.0,1.0,,False,1.2,1.45
+HOU-0133,Sandwich bags 100 pk,Sandwich bags 100 pk,Household,False,17.723907207729308,7.69,720,0.0,0.06,0.0,1.0,,False,1.2,1.45
+HOU-0134,Facial tissue 6 pk,Facial tissue 6 pk,Household,False,14.571878236530791,7.61,720,0.0,0.06,0.0,1.0,,False,1.2,1.45
+HOU-0135,Food storage containers,Food storage containers,Household,False,15.81774154184535,7.86,720,0.0,0.06,0.0,1.0,,False,1.2,1.45
+HOU-0136,Store brand Sponges 6 pk,Sponges 6 pk,Household,True,11.43694158203128,3.66,720,0.0,0.06,0.0,1.0,,False,1.2,1.45
