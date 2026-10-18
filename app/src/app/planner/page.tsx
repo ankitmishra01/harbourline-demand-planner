@@ -7,6 +7,7 @@ import SendOrders from "@/components/SendOrders";
 import SentOrders from "@/components/SentOrders";
 import Offers, { describe, OfferActions, OfferStats, type Offer, type OfferDecision } from "@/components/Offers";
 import { AutonomyChip, AutonomyPanel, type Levels } from "@/components/Autonomy";
+import StoreBrief from "@/components/StoreBrief";
 import { addDays, EXCEPTION_LABEL, fmtWeek, loadMeta, loadStore, money, pct, type ExceptionCode, type Item, type Meta, type Product, type StoreData } from "@/lib/data";
 import { buildPurchaseOrders, evaluateAutonomy, LEVEL_LABEL, markdownOffer, openToBuyCheck, promoOffer, type PurchaseOrder } from "@/lib/logic";
 
@@ -196,6 +197,7 @@ export default function Planner() {
       </div>
 
       {autoOpen && <AutonomyPanel levels={levels} evidence={meta.autonomy_evidence} weeks={meta.holdout_weeks} />}
+      <StoreBrief store={st.store} week={week as 0 | 1} />
 
       <div className="kpis">
         <div className="kpi" title="WAPE: total forecast error divided by total units sold"><div className="v">{pct(st.wape)}</div><div className="l">forecast error (WAPE), last 12 weeks</div></div>
