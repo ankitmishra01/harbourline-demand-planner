@@ -54,7 +54,7 @@ export function factLines(f: BriefFacts): string[] {
     `Store: ${f.name} (${f.store}), ${f.city}, ${f.province}`,
     `Order week: week ${f.week}, starting ${f.week_date}`,
     `Items needing a planner's decision: ${f.needs_review} of ${f.skus} (${f.high} high priority, ${f.medium} medium priority)`,
-    `Stock runs out first (item, days of supply): ${list(f.stockouts.map((x) => `${x.name}, ${x.days} days`))}`,
+    `Stock runs out first (item, days of supply): ${list(f.stockouts.map((x) => `${x.name}, ${x.days} ${x.days === 1 ? "day" : "days"}`))}`,
     `Spoilage risk (item, units at risk): ${list(f.spoilage.map((x) => `${x.name}, ${x.units} units`))}`,
     `Items on promotion this week: ${f.promo}; items in a holiday week: ${f.holiday}; new items: ${f.new_items}`,
     `Forecast error over the last 12 weeks (WAPE): ${pct(f.wape)}`,
