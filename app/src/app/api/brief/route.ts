@@ -16,15 +16,15 @@ const ROOT = path.join(process.cwd(), "data");
  *  Model ids for the gateway come from https://ai-gateway.vercel.sh/v1/models. */
 const DIRECT_MODEL = process.env.BRIEF_MODEL ?? "claude-opus-5-5";
 const GATEWAY_MODELS = (process.env.BRIEF_GATEWAY_MODELS ?? "anthropic/claude-opus-5.5,google/gemini-2.5-flash-lite,google/gemini-2.5-flash").split(",").map((m) => m.trim()).filter(Boolean);
-const GEMINI_MODEL = process.env.GEMINI_MODEL ?? "gemini-flash-latest";
+const GEMINI_MODELS = (process.env.GEMINI_MODELS ?? "gemini-flash-lite-latest,gemini-flash-latest").split(",").map((m) => m.trim()).filter(Boolean);
 
 async function gatewayToken(): Promise<string | undefined> {
   if (process.env.AI_GATEWAY_API_KEY) return process.env.AI_GATEWAY_API_KEY;
   try { return getVercelOidcToken(); } catch { return process.env.VERCEL_OIDC_TOKEN || undefined; }
 }
 
-async function geminiDirect(apiKey: string, system: string, user: string): Promise<string> {
-  const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(GEMINI_MODEL)}:generateContent`, {
+async function geminiDirect(apiKey: string, system: string, user: string, model: string): Promise<string> {
+  const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`, {
     method: "POST", headers: { "content-type": "application/json", "x-goog-api-key": apiKey }, signal: AbortSignal.timeout(25_000),
     body: JSON.stringify({ systemInstruction: { parts: [{ text: system }] }, contents: [{ role: "user", parts: [{ text: user }] }], generationConfig: { maxOutputTokens: 600, temperature: 0.4 } }),
   });
@@ -78,8 +78,15 @@ export async function GET(req: Request) {
         }
       }
       if (!res && process.env.GEMINI_API_KEY) {
-        const text = await geminiDirect(process.env.GEMINI_API_KEY, BRIEF_SYSTEM, user);
-        if (text) return NextResponse.json({ text, source: "model", model: GEMINI_MODEL, facts }, { headers: { "cache-control": "no-store" } });
+        let lastErr: unknown = null;
+        for (const model of GEMINI_MODELS) {
+          tried.push(model);
+          try {
+            const text = await geminiDirect(process.env.GEMINI_API_KEY, BRIEF_SYSTEM, user, model);
+            if (text.split(/\s+/).filter(Boolean).length >= 60) return NextResponse.json({ text, source: "model", model, facts }, { headers: { "cache-control": "no-store" } });
+          } catch (err) { lastErr = err; }
+        }
+        if (lastErr) throw lastErr;
       }
     }
     if (!res) return NextResponse.json({ text: fallback, source: "facts", reason: tried.length ? "no model available" : "no credential", facts });
