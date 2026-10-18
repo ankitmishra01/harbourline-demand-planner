@@ -28,7 +28,7 @@ async function geminiDirect(apiKey: string, system: string, user: string): Promi
     method: "POST", headers: { "content-type": "application/json", "x-goog-api-key": apiKey }, signal: AbortSignal.timeout(25_000),
     body: JSON.stringify({ systemInstruction: { parts: [{ text: system }] }, contents: [{ role: "user", parts: [{ text: user }] }], generationConfig: { maxOutputTokens: 600, temperature: 0.4 } }),
   });
-  if (!r.ok) throw new Error(`gemini ${r.status}`);
+  if (!r.ok) { const body = (await r.text()).slice(0, 160).replace(/\s+/g, " "); throw new Error(`gemini ${r.status}: ${body}`); }
   const d = (await r.json()) as { candidates?: { content?: { parts?: { text?: string }[] } }[] };
   return (d.candidates?.[0]?.content?.parts ?? []).map((p) => p.text ?? "").join("").trim();
 }
@@ -88,7 +88,7 @@ export async function GET(req: Request) {
     if (!text) return NextResponse.json({ text: fallback, source: "facts", facts });
     return NextResponse.json({ text, source: "model", model: res.model, facts }, { headers: { "cache-control": "no-store" } });
   } catch (err) {
-    const reason = err instanceof Anthropic.APIError ? `${err.status}` : "error";
+    const reason = err instanceof Anthropic.APIError ? `gateway ${err.status}` : err instanceof Error ? err.message.slice(0, 80) : "error";
     return NextResponse.json({ text: fallback, source: "facts", reason, facts });
   }
 }

@@ -37,7 +37,7 @@ export function deterministicBrief(f: BriefFacts): string {
   const list = (xs: string[]) => (xs.length <= 1 ? xs.join("") : `${xs.slice(0, -1).join(", ")} and ${xs[xs.length - 1]}`);
   const s: string[] = [];
   s.push(`${f.name} (${f.store}, ${f.city}) has ${f.needs_review} of ${f.skus} items waiting for a decision for week ${f.week}: ${f.high} high priority and ${f.medium} medium.`);
-  if (f.stockouts.length) s.push(`Stock runs out first on ${list(f.stockouts.map((x) => `${x.name} (${x.days} days)`))}.`);
+  if (f.stockouts.length) s.push(`Stock runs out first on ${list(f.stockouts.map((x) => `${x.name} (${x.days} ${x.days === 1 ? "day" : "days"})`))}.`);
   if (f.spoilage.length) s.push(`Spoilage risk sits with ${list(f.spoilage.map((x) => `${x.name} (${x.units} units)`))}.`);
   const flags: string[] = [];
   if (f.promo) flags.push(`${f.promo} on promotion`); if (f.holiday) flags.push(`${f.holiday} in a holiday week`); if (f.new_items) flags.push(`${f.new_items} new`);
