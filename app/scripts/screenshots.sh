@@ -9,7 +9,7 @@ mkdir -p "$OUT"
 for size in "1440x900:desktop" "390x844:mobile"; do
   vp=${size%%:*}; tag=${size##*:}
   $B viewport "$vp" >/dev/null
-  for p in "" planner models business-case plan security about; do
+  for p in "" discovery planner models business-case plan handoff enablement security about how-it-was-built; do
     name=${p:-landing}
     $B goto "$BASE/$p/" >/dev/null; $B wait --networkidle >/dev/null || true
     $B screenshot --viewport "$OUT/$name-$tag.png" >/dev/null

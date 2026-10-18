@@ -66,6 +66,10 @@ export default function About() {
         <h2>Limits</h2>
         <p style={{ margin: 0 }}>Synthetic data is cleaner than real data, so the measured improvements are illustrative. Discovery replaces every assumption with the grocer&apos;s own sales, waste, stock and promotion history, and the go/no-go decision uses those numbers. Orders here are a simple rule (forecast plus safety stock, less stock on hand and on order, rounded to case packs); production would add delivery schedules, minimum orders and shelf capacity. On hand, on order, case packs, lead times, suppliers and open-to-buy are synthetic. Sending orders is simulated in the browser: nothing connects to a retailer system.</p>
       </div>
+      <div className="card" style={{ marginTop: 16 }}>
+        <h2>Read next</h2>
+        <p style={{ margin: 0 }}><a href="/discovery/">How we chose where to start</a> (the discovery work behind the use case) · <a href="/handoff/">What engineering receives</a> (the handoff pack) · <a href="/enablement/">How planners move up the ladder</a> (adoption) · <a href="/how-it-was-built/">How this was built</a> (what the AI did and what the author decided) · <a href="https://github.com/ankitmishra01/harbourline-demand-planner/blob/main/docs/case-study.pdf">One-page case study (PDF)</a>.</p>
+      </div>
     </Shell>
   );
 }

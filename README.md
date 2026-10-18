@@ -19,6 +19,7 @@ Phone width: [landing](docs/screenshots/landing-mobile.png) · [planner](docs/sc
 - [What it does](#what-it-does)
 - [Use cases](#use-cases)
 - [Pages](#pages)
+- [The morning brief (Claude)](#the-morning-brief-claude)
 - [Presenting the demo in five minutes](#presenting-the-demo-in-five-minutes)
 - [Results](#results-12-week-holdout-20-stores--136-products-synthetic-data)
 - [Business case](#how-it-maps-to-the-business-case)
@@ -67,17 +68,25 @@ The pipeline is small enough to read in an afternoon: [`generate_data.py`](pipel
 | Page | What it shows | Where it sits in the plan |
 |---|---|---|
 | Landing | This week's pilot status (order week, stores, items needing a planner, WAPE, in-stock, model in use), the 20 stores with a direct link into each store's order screen, the model table and the business-case levers | |
-| **Planner** | Store picker (also `?store=S01` in the URL), "Order for Wk 43 / Wk 44", KPI strip (WAPE, bias, in-stock, spoilage, inventory value), search by item, SKU or UPC, Department › Category › Subcategory, status, exception, fresh, promo and supplier filters; order table sorted needs-review → priority → days of supply; accept or override with a reason code; change log; send orders (one PO per supplier, open-to-buy check, simulated supplier replies); autonomy ladder per category; suggested markdowns and flyer candidates; item drawer with forecast vs actual, "why this forecast", order calculation, inventory position, fresh info, offers and item accuracy | Pilot, shadow mode |
+| Discovery | How the use case was chosen: a planner's morning today, what we heard in interviews (illustrative), six candidate use cases scored on value, data and feasibility, why replenishment first, build or buy, and where else the pattern applies | Discovery weeks 1 to 3 |
+| **Planner** | Store picker (also `?store=S01` in the URL), the morning brief (see below), "Order for Wk 43 / Wk 44", KPI strip (WAPE, bias, in-stock, spoilage, inventory value), search by item, SKU or UPC, Department › Category › Subcategory, status, exception, fresh, promo and supplier filters; order table sorted needs-review → priority → days of supply; accept or override with a reason code; change log; send orders (one PO per supplier, open-to-buy check, simulated supplier replies); autonomy ladder per category; suggested markdowns and flyer candidates; item drawer with forecast vs actual, "why this forecast", order calculation, inventory position, fresh info, offers and item accuracy | Pilot, shadow mode |
 | Model comparison | Four steps ("start simple, test honestly"), results table, winner per category, the "sales are not demand" watch-out | Discovery week 5 checkpoint |
 | Business case | Three levers, cumulative cash, costs, low/base/high, break-even, comparison with published results, and the synthetic backtest (illustrative) | Discovery week 7 checkpoint |
 | Delivery plan | The 7-week discovery plan and three checkpoints, six risks with owners, pilot and adoption, how the planner connects to the ordering system and how autonomy is earned | The whole journey |
+| Handoff pack | What engineering receives at the end of discovery: the artifact list, the week-1 data contract and quality rules, the architecture sketch, acceptance criteria per checkpoint, what is in and out of the pilot | Discovery week 7 |
+| Enablement | How planners move from approving every line to supervising a system: roles, the pilot week by week, the ladder from a planner's chair, override reasons as training data, coaching, adoption signals, what goes wrong | Pilot |
+| How it was built | What the AI did and what the author decided, the working loop, the guardrails, what the tools got wrong and how it was caught, how to reproduce it | |
 | Data & security | Canadian residency, encryption, role-based access, monitoring, integration and write access, sign-off at weeks 5 and 7 | Sixth risk |
 | About | Data, models, review rules and thresholds, formulas, design references, limits | |
 
+## The morning brief (Claude)
+
+The planner has a "Brief me on this store" button. The server computes the facts for that store and week from the exported data (items needing a decision, the first stockouts and spoilage risks, promotion and holiday flags, forecast error, stock value, open to buy, which categories order on their own) in [`app/src/lib/brief.ts`](app/src/lib/brief.ts), then asks Claude to rephrase them for a planner in 110 to 150 words with the instruction that every number, product and category must come from the facts. The call goes through the official Anthropic SDK, either directly (`ANTHROPIC_API_KEY`, model `claude-opus-5-5`) or through Vercel AI Gateway with the deployment's OIDC token (gateway model `anthropic/claude-opus-5.5`). Without a credential, or on any error or refusal, the same facts come back as plain sentences, so the button always works and the screen never depends on a model. The facts and the fallback text are covered by [`app/tests/brief.test.ts`](app/tests/brief.test.ts). This is the one place a language model is used, and it is deliberately the one place where the arithmetic is already done.
+
 ## Presenting the demo in five minutes
 
-1. **Landing page.** Point at the status strip (Wk 43, 20 stores, 424 of 2,720 items need a planner) and the store tiles. Click a store with a high review count.
-2. **Store order review.** The violet tile counts the items that need a planner this week; the rest are auto-approved. The table is sorted needs-review first, then priority, then days of supply. Read one High row aloud: stock runs out before the next delivery.
+1. **Landing page.** Point at the status strip (Wk 43, 20 stores, 424 of 2,720 items need a planner) and the store tiles. Click a store with a high review count. If the audience is a consultancy, open Discovery first: how the use case was chosen.
+2. **Store order review.** Press "Brief me on this store" and read the brief aloud, then point at the violet tile that counts the items needing a planner this week; the rest are auto-approved. The table is sorted needs-review first, then priority, then days of supply. Read one High row aloud: stock runs out before the next delivery.
 3. **Open an item** (click a row). Walk the drawer top to bottom: forecast vs actual with the P10 to P90 band, "why this forecast", the order calculation, inventory position, fresh spoilage, and the suggested offer if there is one.
 4. **Accept or override.** Accept one suggestion; override another with a reason. Show the change log filling up.
 5. **Send orders.** "Review and send" is blocked while exceptions remain; use "Accept the N remaining", then review the sheet: one purchase order per supplier, lead time, expected delivery, open-to-buy check. Send. Watch the Sent orders cards move Sent → Acknowledged (20 s) → Shipped (60 s) → Received.
@@ -190,7 +199,8 @@ Phone width: [send sheet](docs/screenshots/planner-send-sheet-mobile.png) · [se
 - **Design:** the AM Consulting Group design language (ink, paper, violet; hairline dividers; 4px radius; weight-500 tight-tracked display type; 44px controls; violet for selection and the next action, green for verified, red for rejection). Tokens are CSS variables in [`app/src/app/globals.css`](app/src/app/globals.css). Harbourline Foods, its wordmark and its stores are invented.
 - **Tests and CI:** 30 Python tests and 7 Node tests. [`.github/workflows/ci.yml`](.github/workflows/ci.yml) runs the tests, typecheck and build on every push and can re-run the pipeline on demand.
 - **Hosting:** Vercel, no environment variables, no database.
-- **Tooling:** built with Claude Code and Codex, with the author reviewing every model choice, threshold and sentence.
+- **Tooling:** built with Claude Code and Codex, with the author reviewing every model choice, threshold and sentence. The [How it was built](https://harbourline-demand-planner.vercel.app/how-it-was-built/) page has the split between what the AI did and what the author decided.
+- **One-page case study:** [docs/case-study.md](docs/case-study.md) and [docs/case-study.pdf](docs/case-study.pdf), written to be forwarded.
 
 ## Run it locally
 
@@ -215,8 +225,9 @@ data/generated/    synthetic sales, products, stores
 data/results/      backtest, forecasts, holdout predictions
 pipeline/          generate_data.py → train_backtest.py → export.py; business_case.py; simulate.py
 tests/             order formula, exception rules, planner data invariants, generated data invariants, business case reproduction
-app/               Next.js app (landing, planner, models, business case, plan, security, about); src/lib/logic.ts holds the PO, offer and autonomy rules; app/data/ is the exported JSON served by /api/data
+app/               Next.js app (landing, discovery, planner, models, business case, plan, handoff, enablement, security, about, how it was built); src/lib/logic.ts holds the PO, offer and autonomy rules, src/lib/brief.ts the morning-brief facts; app/data/ is the exported JSON served by /api/data; /api/brief calls Claude
 docs/screenshots/  desktop (1440) and phone (390) captures of every page and planner state
+docs/case-study.md One-page case study (and .pdf)
 ```
 
 ## Deliberate simplifications
