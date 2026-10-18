@@ -95,7 +95,7 @@ export default async function Landing() {
 
       <section className="colophon" aria-label="About this prototype">
         <p><strong>Built by Ankit Mishra</strong> as an open work sample. Harbourline Foods is a fictional retailer and every number is synthetic; not affiliated with any company. Nothing to sign in to, and what you do here stays in your browser.</p>
-        <p className="colophon-links"><Link href="/about/">About this prototype</Link><Link href="/plan/">Delivery plan</Link><Link href="/security/">Data &amp; security</Link><a href={GITHUB_URL}>Source on GitHub</a></p>
+        <p className="colophon-links"><Link href="/discovery/">How we chose where to start</Link><Link href="/handoff/">Handoff pack</Link><Link href="/enablement/">Planner enablement</Link><Link href="/how-it-was-built/">How it was built</Link><Link href="/about/">About</Link><a href={GITHUB_URL}>Source on GitHub</a></p>
       </section>
     </Shell>
   );
