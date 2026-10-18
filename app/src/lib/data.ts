@@ -22,7 +22,7 @@ export type WeekEvidence = { week: string; wape: number; bias: number; stockout_
 export type AutonomyEvidence = { weeks: WeekEvidence[]; wape: number; bias: number; fresh: boolean; review_days: number };
 export type Meta = {
   generated_note: string; rules: Record<ExceptionCode, string>; review_days: Record<string, number>; autonomy_evidence: Record<string, AutonomyEvidence>; history_weeks: string[]; forecast_weeks: [string, string]; forecast_week_numbers: [number, number]; holdout_weeks: string[];
-  stores: StoreSummary[]; products: Product[]; categories: string[]; selected_model: string; selection_rule: string; z_planner: number;
+  stores: StoreSummary[]; products: Product[]; categories: string[]; selected_model: string; selection_rule: string; z_planner: number; service_z_by_category?: Record<string, number>;
   backtest: Backtest[]; backtest_by_category: CategoryResult[]; chain_kpis: Kpis;
   chain_holdout: { weeks: string[]; actual: number[]; model: number[]; baseline: number[] };
   business_case: { assumptions: Record<string, number | number[]>; breakeven_m: number; investment_m: number; run_cost_m: number;

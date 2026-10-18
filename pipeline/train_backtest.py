@@ -10,6 +10,13 @@ Models (simplest first):
   4. Hierarchical    the ML forecasts reconciled with a region-level model so that
                      store, region and national forecasts agree
 
+Ordering policy: the service level is calibrated per category on the validation window by
+simulated dollars, rather than assumed to be one number for every product. Fresh categories
+carry a different cost of being wrong than ambient ones, so they get a different service level.
+This follows the newsvendor logic described in Amazon's account of its forecasting algorithm
+(https://www.amazon.science/latest-news/the-history-of-amazons-forecasting-algorithm), with the
+quantile measured on held-out data instead of derived from a closed form.
+
 The backtest is a rolling one-week-ahead (and two-weeks-ahead) evaluation: each week's
 forecast only uses data available before that week. Models are compared on accuracy
 (WAPE, bias) and on dollars: lost margin from empty shelves, waste of unsold perishables
@@ -208,6 +215,31 @@ def series_sigma(rows, pred):
     return rows.category.map(cs).values * np.sqrt(np.clip(level / cat_level, 0.1, 10)).values
 
 
+Z_GRID = [0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0]
+
+
+def calibrate_service_levels(val, pred, sigma):
+    """Pick the safety factor per category that minimises simulated dollars on the validation
+    window. One global number cannot express the asymmetry: a day-old loaf is nearly worthless
+    while a tin of beans only costs its carrying rate, so the two want different service levels."""
+    out = {}
+    for cat, g in val.groupby("category"):
+        ix = val.index.get_indexer(g.index)
+        out[cat] = min(Z_GRID, key=lambda z: sim.price_outcome(g, *sim.simulate(g, pred[ix], sigma[ix], z))["total"])
+    return out
+
+
+def dollars_by_category(rows, pred, sigma, zmap):
+    """Price a forecast using each category's own calibrated service level."""
+    tot = {}
+    for cat, g in rows.groupby("category"):
+        ix = rows.index.get_indexer(g.index)
+        d = sim.price_outcome(g, *sim.simulate(g, pred[ix], sigma[ix], zmap.get(cat, Z_ORDER)))
+        for k, v in d.items():
+            tot[k] = tot.get(k, 0.0) + v
+    return tot
+
+
 def main():
     df, prod, stores, meta, weeks = load()
     n_hist = len(weeks) - 2
@@ -230,6 +262,9 @@ def main():
     for k in ALL_MODELS:
         sig[k] = series_sigma(val, vpred[k])
     sig_lookup = {k: pd.Series(sig[k], index=pd.MultiIndex.from_frame(val[["store", "sku"]])).groupby(level=[0, 1]).first() for k in ALL_MODELS}
+    # Service level per category, measured on validation with the ML forecast (the model the
+    # planner actually orders from). Never fitted on the holdout, so the holdout stays honest.
+    service_z = calibrate_service_levels(val, vpred["ml"], sig["ml"])
 
     # --- Holdout pass (fit before H, rolling one- and two-step forecasts on H..end of history).
     ho = hist[hist.t >= H]
@@ -247,7 +282,7 @@ def main():
     for k in ALL_MODELS:
         s = ho.set_index(["store", "sku"]).index.map(sig_lookup[k].to_dict()).to_numpy(dtype=float)
         ho_sig[k] = s = np.nan_to_num(s, nan=float(np.nanmedian(s)))
-        d = dollars(ho, preds[1][k], s)
+        d = dollars_by_category(ho, preds[1][k], s, service_z)
         results.append({"model": k, "label": MODEL_LABEL[k], "wape_next_week": wape(y, preds[1][k]), "wape_week_after": wape(y, preds[2][k]),
                         "bias_next_week": bias(y, preds[1][k]), **{f"usd_{kk}": float(v) for kk, v in d.items()}})
     res = pd.DataFrame(results)
@@ -271,7 +306,7 @@ def main():
                "wape_selected": wape(g.units.values, preds[1][selected][ix])}
         for k in ALL_MODELS:
             row[f"wape_{k}"] = wape(g.units.values, preds[1][k][ix])
-            row[f"usd_{k}"] = float(dollars(g, preds[1][k][ix], ho_sig[k][ix])["total"])
+            row[f"usd_{k}"] = float(dollars_by_category(g, preds[1][k][ix], ho_sig[k][ix], service_z)["total"])
         row["winner"] = min(MODEL_ORDER, key=lambda k: row[f"usd_{k}"])
         by_cat.append(row)
 
@@ -316,7 +351,8 @@ def main():
     ho_out.to_csv(OUT / "holdout.csv.gz", index=False, compression="gzip")
     json.dump({"selected": selected, "selection_rule": "Among models that beat the baseline in dollars, pick the simplest one whose savings are within 10% of the best.",
                "holdout_weeks": [weeks[H], weeks[n_hist - 1]], "validation_weeks": [weeks[V], weeks[H - 1]],
-               "measured_levers": measured, "z_order_backtest": Z_ORDER, "z_planner": Z_PLANNER},
+               "measured_levers": measured, "z_order_backtest": Z_ORDER, "z_planner": Z_PLANNER,
+               "service_z_by_category": service_z},
               open(OUT / "summary.json", "w"), indent=1)
     print(res[["model", "wape_next_week", "wape_week_after", "bias_next_week", "usd_total", "usd_saved_vs_baseline", "pct_cost_cut"]].round(3).to_string(index=False))
     print("selected:", selected, "| measured levers:", {k: round(v, 4) for k, v in measured.items()})

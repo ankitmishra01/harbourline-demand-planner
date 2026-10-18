@@ -10,10 +10,20 @@
   "2026-07-20"
  ],
  "measured_levers": {
-  "sales_uplift": 0.018782790883650733,
-  "waste_cut": 0.26787570030975205,
-  "inv_cut": 0.25979435589371247
+  "sales_uplift": 0.014892597175388073,
+  "waste_cut": 0.43113673039384465,
+  "inv_cut": 0.26686535585304905
  },
  "z_order_backtest": 1.0,
- "z_planner": 1.28
+ "z_planner": 1.28,
+ "service_z_by_category": {
+  "Bakery": 0.0,
+  "Beverages": 5.0,
+  "Dairy & Eggs": 4.0,
+  "Frozen": 3.0,
+  "Household": 3.0,
+  "Meat & Seafood": 0.5,
+  "Pantry": 3.0,
+  "Produce": 2.0
+ }
 }

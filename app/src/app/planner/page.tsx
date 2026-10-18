@@ -272,7 +272,7 @@ export default function Planner() {
           </table>
         )}
       </div>
-      <p className="muted" style={{ fontSize: 12 }}>Suggested order = forecast + safety stock − on hand − on order, rounded up to whole cases. Safety stock covers forecast uncertainty at about a {meta.z_planner === 1.28 ? "90%" : ""} service level over the category&apos;s review period. Priority: High when stock runs out before the next delivery or fresh stock will spoil; Medium for any other exception; Low otherwise. Changing a final order asks for a reason; decisions, sent orders and the change log are kept in this browser only. In the pilot, shadow mode records these decisions next to today&apos;s orders without changing them.</p>
+      <p className="muted" style={{ fontSize: 12 }}>Suggested order = forecast + safety stock − on hand − on order, rounded up to whole cases. Safety stock covers forecast uncertainty at the service level calibrated for that category on the validation weeks, measured in dollars rather than assumed. Priority: High when stock runs out before the next delivery or fresh stock will spoil; Medium for any other exception; Low otherwise. Changing a final order asks for a reason; decisions, sent orders and the change log are kept in this browser only. In the pilot, shadow mode records these decisions next to today&apos;s orders without changing them.</p>
 
       <div className="card t-blue">
         <h2>Send orders · Wk {wn[week]}</h2>
@@ -402,7 +402,7 @@ function Drawer({ it, p, meta, week, status, level, offers, offerDecisions, offe
             <div key={wi} className="calc" style={{ marginBottom: 10, opacity: wi === week ? 1 : 0.65 }}>
               <strong style={{ gridColumn: "1 / -1" }}>Wk {wn[wi]} · {fmtWeek(fx.week)}</strong>
               <span>Forecast (P50)</span><span className="num">{r0(fx.p50)}</span>
-              <span>+ Safety stock (1.28 × σ × √({it.review_days}/7))</span><span className="num">{r0(fx.safety)}</span>
+              <span>+ Safety stock ({(meta.service_z_by_category?.[p.category] ?? meta.z_planner)} × σ × √({it.review_days}/7))</span><span className="num">{r0(fx.safety)}</span>
               <span>− On hand{wi === 1 ? " (projected)" : ""}</span><span className="num">{r0(oh)}</span>
               <span>− On order</span><span className="num">{r0(oo)}</span>
               <span>= Units needed</span><span className="num">{fx.raw_order}</span>

@@ -48,7 +48,7 @@ export default function About() {
           <h2>Formulas on the order screen</h2>
           <ul className="clean" style={{ fontSize: 13 }}>
             <li><strong>Suggested order</strong> = forecast (P50) + safety stock − on hand − on order, never below zero, rounded up to whole cases.</li>
-            <li><strong>Safety stock</strong> = 1.28 × σ × √(review days ÷ 7), about a 90% service level over the category&apos;s review period. σ is the item&apos;s forecast error from the validation weeks.</li>
+            <li><strong>Safety stock</strong> = z<sub>category</sub> × σ × √(review days ÷ 7). σ is the item&apos;s forecast error from the validation weeks. The service level z is <strong>calibrated per category on the validation window</strong> by simulated dollars, not assumed: being a unit short costs lost margin, while a surplus unit costs waste on a short shelf life and only carrying cost on a long one, so bakery and ambient groceries want very different cover. Measured levels run from 0 on Bakery to 5 on Beverages.</li>
             <li><strong>Days of supply</strong> = stock ÷ (forecast ÷ 7). Stock on order counts only when it lands before the shelf runs empty.</li>
             <li><strong>Week after:</strong> on hand is projected from today&apos;s stock plus this week&apos;s order, less this week&apos;s forecast and spoilage, so nothing is counted twice.</li>
             <li><strong>Projected spoilage</strong> = fresh stock beyond what the remaining shelf life can sell at the forecast rate, plus handling shrink; a chain-wide 1.5% of sales at cost in the backtest.</li>

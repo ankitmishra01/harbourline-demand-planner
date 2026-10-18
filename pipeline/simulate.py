@@ -40,6 +40,7 @@ def simulate(rows, pred, sigma, z):
     cats = rows.category.values
     shelf = rows.shelf_life_days.values.astype(float)
     target = np.clip(pred + z * np.array([safety_scale(c) for c in cats]) * sigma, 0, None)
+    expected = np.clip(pred, 0, None)   # shelf-life cover is a function of demand, not of what we ordered
     for _, ix in rows.groupby(["store", "sku"], sort=False).indices.items():
         carry = 0.0
         for i in ix:
@@ -49,7 +50,10 @@ def simulate(rows, pred, sigma, z):
             rem = avail - s
             # Leftover beyond what the remaining shelf life can cover (measured in next week's expected
             # demand) spoils. Stock bought at the start of the week has already used a day on the shelf.
-            cover = max(shelf[i] - 1.0, 0.0) / 7.0 * max(target[i], 1.0) if shelf[i] <= 14 else float("inf")
+            # Cover is keyed to the FORECAST, not to the order-up-to level: keying it to the order made
+            # safety stock self-justifying, because ordering more enlarged the window that excused it,
+            # and the calibration below ran away to a 6.5-sigma service level on Produce as a result.
+            cover = max(shelf[i] - 1.0, 0.0) / 7.0 * max(expected[i], 1.0) if shelf[i] <= 14 else float("inf")
             sp = max(0.0, rem - cover) + s * HANDLING_SHRINK[cats[i]]
             sp = min(sp, rem + s * HANDLING_SHRINK[cats[i]])
             order[i], sold[i], spoiled[i], left[i] = o, s, sp, max(0.0, rem - max(0.0, rem - cover))

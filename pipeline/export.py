@@ -141,6 +141,9 @@ def main():
     hist_weeks = sorted(sales.dropna(subset=["units"]).week.unique())
     w1, w2 = meta["forecast_weeks"]
     z = summary["z_planner"]
+    # Per-category service levels measured on the validation window (see train_backtest.py).
+    # Falls back to the single planner factor for any category not in the map.
+    service_z = summary.get("service_z_by_category", {})
     pinfo = prod.set_index("sku")
 
     APP.mkdir(parents=True, exist_ok=True)
@@ -210,7 +213,8 @@ def main():
             on_order = int(round(recent * rng.uniform(0.15, 0.5))) if (lead >= 2 and rng.random() < 0.45) else 0
             # Safety stock covers demand over the review period (daily-ordered categories need less).
             scale = sim.safety_scale(p.category)
-            raw1, ss1 = suggested_order(a.p50, a.sigma * scale, on_hand, on_order, z)
+            zc = service_z.get(a.category, z)
+            raw1, ss1 = suggested_order(a.p50, a.sigma * scale, on_hand, on_order, zc)
             o1 = round_to_case(raw1, case)
             # Projected spoilage this week: stock beyond the remaining shelf-life cover, plus handling shrink.
             cover = max(p.shelf_life_days - 1, 0) / 7 * max(a.p50 + z * a.sigma * scale, 1) if perishable else float("inf")
@@ -218,7 +222,7 @@ def main():
             spoil = int(round(max(0.0, closing - cover) + min(a.p50, on_hand + on_order + o1) * sim.HANDLING_SHRINK[p.category])) if perishable else 0
             # Week after: this week's order has landed, this week's forecast has sold, spoilage is gone.
             proj = max(0.0, closing - (max(0.0, closing - cover) if perishable else 0.0))
-            raw2, ss2 = suggested_order(b.p50, b.sigma * scale, proj, 0, z)
+            raw2, ss2 = suggested_order(b.p50, b.sigma * scale, proj, 0, zc)
             o2 = round_to_case(raw2, case)
             # Days of supply = stock / forecast daily demand. On order counts once it lands (after the lead time).
             dos_on_hand = on_hand / daily
@@ -308,7 +312,7 @@ def main():
         "history_weeks": hist_weeks, "forecast_weeks": [w1, w2],
         "forecast_week_numbers": [int(pd.Timestamp(w).isocalendar().week) for w in (w1, w2)], "holdout_weeks": ho_weeks,
         "stores": store_summ, "products": products, "categories": sorted(prod.category.unique().tolist()),
-        "selected_model": summary["selected"], "selection_rule": summary["selection_rule"], "z_planner": z, "rules": RULES,
+        "selected_model": summary["selected"], "selection_rule": summary["selection_rule"], "z_planner": z, "service_z_by_category": service_z, "rules": RULES,
         "review_days": sim.REVIEW_DAYS,
         "backtest": [{k: (round(v, 4) if isinstance(v, float) else v) for k, v in row.items()} for row in bt.to_dict("records")],
         "backtest_by_category": [{k: (round(v, 4) if isinstance(v, float) else v) for k, v in row.items()} for row in bycat.to_dict("records")],
