@@ -40,6 +40,7 @@ export async function GET(req: Request) {
   const url = new URL(req.url);
   const store = url.searchParams.get("store") ?? "S09";
   const week = url.searchParams.get("week") === "1" ? 1 : 0;
+  const forceGemini = url.searchParams.get("provider") === "gemini"; // test switch: skip the gateway and use the direct Gemini key
   if (!/^S\d{2}$/.test(store)) return NextResponse.json({ error: "Unknown store" }, { status: 404 });
   let meta: Meta; let items: Item[];
   try {
@@ -62,7 +63,7 @@ export async function GET(req: Request) {
       const client = new Anthropic({ apiKey: direct, timeout: 25_000, maxRetries: 1 });
       res = await client.messages.create({ model: DIRECT_MODEL, max_tokens: 2000, system: BRIEF_SYSTEM, messages: [{ role: "user", content: user }] });
     } else {
-      const token = await gatewayToken();
+      const token = forceGemini ? undefined : await gatewayToken();
       if (token) {
         const client = new Anthropic({ apiKey: token, baseURL: "https://ai-gateway.vercel.sh", timeout: 25_000, maxRetries: 0 });
         for (const model of GATEWAY_MODELS) {
