@@ -12,7 +12,7 @@ A better forecast tells each store how much to order. This repository is a worki
 |---|---|---|---|
 | ![Planner](docs/screenshots/planner-desktop.png) | ![Planner detail](docs/screenshots/planner-drawer-desktop.png) | ![Models](docs/screenshots/models-desktop.png) | ![Business case](docs/screenshots/business-case-desktop.png) |
 
-Phone width: [landing](docs/screenshots/landing-mobile.png) · [planner](docs/screenshots/planner-mobile.png) · [drawer](docs/screenshots/planner-drawer-mobile.png) · [models](docs/screenshots/models-mobile.png) · [business case](docs/screenshots/business-case-mobile.png) · [delivery plan](docs/screenshots/plan-mobile.png) · [security](docs/screenshots/security-mobile.png) · [about](docs/screenshots/about-mobile.png)
+Phone width: [landing](docs/screenshots/landing-mobile.png) · [discovery](docs/screenshots/discovery-mobile.png) · [planner](docs/screenshots/planner-mobile.png) · [brief](docs/screenshots/planner-brief-mobile.png) · [handoff](docs/screenshots/handoff-mobile.png) · [enablement](docs/screenshots/enablement-mobile.png) · [how it was built](docs/screenshots/how-it-was-built-mobile.png) · [drawer](docs/screenshots/planner-drawer-mobile.png) · [models](docs/screenshots/models-mobile.png) · [business case](docs/screenshots/business-case-mobile.png) · [delivery plan](docs/screenshots/plan-mobile.png) · [security](docs/screenshots/security-mobile.png) · [about](docs/screenshots/about-mobile.png)
 
 ## Contents
 
@@ -181,9 +181,9 @@ Priority: **High** when the stockout or spoilage rule fires (64 lines chain-wide
 
 ## After approval: sending orders and earning autonomy
 
-| Send sheet | Sent orders | Autonomy ladder |
-|---|---|---|
-| ![Send sheet](docs/screenshots/planner-send-sheet-desktop.png) | ![Sent orders](docs/screenshots/planner-sent-orders-desktop.png) | ![Autonomy](docs/screenshots/planner-autonomy-desktop.png) |
+| Morning brief | Send sheet | Sent orders | Autonomy ladder |
+|---|---|---|---|
+| ![Morning brief](docs/screenshots/planner-brief-desktop.png) | ![Send sheet](docs/screenshots/planner-send-sheet-desktop.png) | ![Sent orders](docs/screenshots/planner-sent-orders-desktop.png) | ![Autonomy](docs/screenshots/planner-autonomy-desktop.png) |
 
 - **Send orders.** Once every exception is decided, the planner reviews one purchase order per supplier or DC (lines, cases, cost at cost price, lead time, expected delivery, lines changed) and the week's spend against the store's open-to-buy (cost of expected sales × 1.10 in the prototype). Sending is simulated: each PO gets a number and moves Sent → Acknowledged (EDI 855, 20 s) → Shipped (EDI 856, 60 s) → Received (at the expected delivery date or after 120 s), with the stage derived from the send time so a reload keeps it. The Delivery plan page shows the real loop: planner app → ordering/ERP (API or EDI 850) → acknowledgement → ship notice → goods receipt → nightly feed back into the forecast.
 - **Autonomy ladder.** L1 planner approves every line (shadow mode) · L2 exceptions only (this screen) · L3 autonomous replenishment with veto. Thresholds are set per category class, because ambient items forecast better and stock out less than fresh: ambient WAPE ≤ 35%, bias ± 5%, overrides ≤ 5% of lines, stockouts ≤ 10% of lines; fresh WAPE ≤ 40%, stockouts ≤ 30%. A category moves up after four consecutive passing weeks and drops back after two consecutive misses; fresh categories are capped at L2 through the pilot. Household holds L3 on the backtest evidence; Frozen is on a passing streak; Pantry and Beverages have recent misses.
