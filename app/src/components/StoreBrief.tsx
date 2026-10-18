@@ -1,7 +1,9 @@
 "use client";
 import { useEffect, useState } from "react";
 
-type Brief = { text: string; source: "claude" | "facts"; model?: string; reason?: string };
+function modelLabel(m?: string) { if (!m) return "a language model"; const id = m.split("/").pop() ?? m; if (/claude/i.test(id)) return `Claude (${id})`; if (/gemini/i.test(id)) return `Gemini (${id})`; return id; }
+
+type Brief = { text: string; source: "model" | "facts"; model?: string; reason?: string };
 
 /** "Brief me on this store": the facts are computed on the server from the exported data; Claude only rephrases them.
  *  If no model is configured the same facts come back as plain sentences, so the button always works. */
@@ -26,7 +28,7 @@ export default function StoreBrief({ store, week }: { store: string; week: 0 | 1
         <div className="brief-body" aria-live="polite">
           {busy && !brief && <p className="muted">Reading the store's forecasts, stock and exceptions…</p>}
           {brief && brief.text.split(/\n+/).map((p, i) => <p key={i}>{p}</p>)}
-          {brief && <p className="brief-source">{brief.source === "claude" ? `Written by Claude (${brief.model ?? "via AI Gateway"}) from facts computed on the server; every number comes from the table below.` : "Written from the facts directly, without a model. Every number comes from the table below."}</p>}
+          {brief && <p className="brief-source">{brief.source === "model" ? `Written by ${modelLabel(brief.model)} from facts computed on the server; every number comes from the table below.` : "Written from the facts directly, without a model. Every number comes from the table below."}</p>}
         </div>
       )}
     </div>

@@ -2,7 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import path from "node:path";
-import { buildBriefFacts, deterministicBrief } from "../src/lib/brief.ts";
+import { buildBriefFacts, deterministicBrief, factLines } from "../src/lib/brief.ts";
 import { evaluateAutonomy } from "../src/lib/logic.ts";
 import type { Item, Meta } from "../src/lib/data.ts";
 
@@ -31,4 +31,14 @@ test("deterministic brief mentions every headline number and no product outside 
   for (const s of f.stockouts) assert.ok(text.includes(s.name));
   assert.ok(text.split(" ").length < 220);
   assert.ok(!text.includes("--") && !text.includes("—"));
+});
+
+test("fact lines carry formatted percentages and keep L3 and L2 categories apart", () => {
+  const f = buildBriefFacts(meta, st, items, 0, levels);
+  const lines = factLines(f);
+  assert.ok(lines.some((l) => l.includes("(WAPE): ") && l.includes("%")));
+  const l3 = lines.find((l) => l.startsWith("Categories ordering autonomously"))!;
+  const l2 = lines.find((l) => l.startsWith("Categories at exceptions-only"))!;
+  for (const c of f.l3) { assert.ok(l3.includes(c)); assert.ok(!l2.includes(c)); }
+  for (const c of f.l2) assert.ok(l2.includes(c));
 });

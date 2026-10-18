@@ -19,7 +19,7 @@ Phone width: [landing](docs/screenshots/landing-mobile.png) · [discovery](docs/
 - [What it does](#what-it-does)
 - [Use cases](#use-cases)
 - [Pages](#pages)
-- [The morning brief (Claude)](#the-morning-brief-claude)
+- [The morning brief](#the-morning-brief)
 - [Presenting the demo in five minutes](#presenting-the-demo-in-five-minutes)
 - [Results](#results-12-week-holdout-20-stores--136-products-synthetic-data)
 - [Business case](#how-it-maps-to-the-business-case)
@@ -79,9 +79,11 @@ The pipeline is small enough to read in an afternoon: [`generate_data.py`](pipel
 | Data & security | Canadian residency, encryption, role-based access, monitoring, integration and write access, sign-off at weeks 5 and 7 | Sixth risk |
 | About | Data, models, review rules and thresholds, formulas, design references, limits | |
 
-## The morning brief (Claude)
+## The morning brief
 
-The planner has a "Brief me on this store" button. The server computes the facts for that store and week from the exported data (items needing a decision, the first stockouts and spoilage risks, promotion and holiday flags, forecast error, stock value, open to buy, which categories order on their own) in [`app/src/lib/brief.ts`](app/src/lib/brief.ts), then asks Claude to rephrase them for a planner in 110 to 150 words with the instruction that every number, product and category must come from the facts. The call goes through the official Anthropic SDK, either directly (`ANTHROPIC_API_KEY`, model `claude-opus-5-5`) or through Vercel AI Gateway with the deployment's OIDC token (gateway model `anthropic/claude-opus-5.5`). Without a credential, or on any error or refusal, the same facts come back as plain sentences, so the button always works and the screen never depends on a model. The facts and the fallback text are covered by [`app/tests/brief.test.ts`](app/tests/brief.test.ts). This is the one place a language model is used, and it is deliberately the one place where the arithmetic is already done.
+The planner has a "Brief me on this store" button. The server computes the facts for that store and week from the exported data (items needing a decision, the first stockouts and spoilage risks, promotion and holiday flags, forecast error, stock value, open to buy, which categories order on their own) in [`app/src/lib/brief.ts`](app/src/lib/brief.ts), then asks a language model to rephrase them for a planner in 110 to 150 words with the instruction that every number, product and category must come from the facts. The screen says which model wrote it.
+
+Model paths, in order, all through the official Anthropic SDK's Messages API shape: a direct Anthropic key (`ANTHROPIC_API_KEY`, `claude-opus-5-5`); otherwise Vercel AI Gateway authenticated with the deployment's own OIDC identity, trying `anthropic/claude-opus-5.5` and then `google/gemini-2.5-flash` and `google/gemini-2.5-flash-lite` (the gateway's free tier allows the Gemini models, so the hosted demo runs with no key at all); and a direct Google key (`GEMINI_API_KEY`, `gemini-flash-latest`) as a further free option. Without any of these, or on any error or refusal, the same facts come back as plain sentences, so the button always works and the screen never depends on a model. The facts and the fallback text are covered by [`app/tests/brief.test.ts`](app/tests/brief.test.ts). This is the one place a language model is used, and it is deliberately the one place where the arithmetic is already done.
 
 ## Presenting the demo in five minutes
 

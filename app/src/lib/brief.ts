@@ -47,4 +47,22 @@ export function deterministicBrief(f: BriefFacts): string {
   return s.join(" ");
 }
 
-export const BRIEF_SYSTEM = "You write a morning brief for a grocery store planner. You receive a JSON object of facts about one store for one order week. Write 110 to 150 words in plain English, in four short paragraphs at most, in the second person. Use only the facts given: every number, product and category you mention must appear in the JSON, and do not add numbers, causes or recommendations that are not there. Lead with what needs a decision first (stockouts, then spoilage), then the flags, then one sentence on how the forecast is doing, then one sentence on which categories order on their own. No headings, no bullet points, no dashes, no exclamation marks.";
+/** Labelled, pre-formatted fact lines for the model, so percentages and category levels cannot be misread. */
+export function factLines(f: BriefFacts): string[] {
+  const list = (xs: string[]) => (xs.length ? xs.join("; ") : "none");
+  return [
+    `Store: ${f.name} (${f.store}), ${f.city}, ${f.province}`,
+    `Order week: week ${f.week}, starting ${f.week_date}`,
+    `Items needing a planner's decision: ${f.needs_review} of ${f.skus} (${f.high} high priority, ${f.medium} medium priority)`,
+    `Stock runs out first (item, days of supply): ${list(f.stockouts.map((x) => `${x.name}, ${x.days} days`))}`,
+    `Spoilage risk (item, units at risk): ${list(f.spoilage.map((x) => `${x.name}, ${x.units} units`))}`,
+    `Items on promotion this week: ${f.promo}; items in a holiday week: ${f.holiday}; new items: ${f.new_items}`,
+    `Forecast error over the last 12 weeks (WAPE): ${pct(f.wape)}`,
+    `In stock: ${pct(f.in_stock)}; spoilage at cost: ${pct(f.spoilage_pct)} of sales`,
+    `Stock on hand at cost: ${money(f.inventory_value)}; this week's orders cost ${money(f.orders_cost)} against ${money(f.open_to_buy)} open to buy`,
+    `Categories ordering autonomously with a planner veto (level L3): ${list(f.l3)}`,
+    `Categories at exceptions-only review (level L2, the planner decides the flagged lines): ${list(f.l2)}`,
+  ];
+}
+
+export const BRIEF_SYSTEM = "You write a morning brief for a grocery store planner. You receive labelled facts about one store for one order week, and a draft that is already correct. Rewrite the draft so a planner reads it quickly: 110 to 150 words, plain English, second person, at most four short paragraphs. Keep every number, percentage, product name and category exactly as written in the facts; percentages are already formatted, so copy them as they appear. Do not add numbers, causes, recommendations or categories that are not in the facts. Keep the distinction between categories that order autonomously (L3) and categories at exceptions-only review (L2). Order: what needs a decision first (stockouts, then spoilage), then the flags, then one sentence on the forecast, then one sentence on category autonomy. No headings, no bullet points, no dashes, no exclamation marks.";

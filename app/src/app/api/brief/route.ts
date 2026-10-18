@@ -2,17 +2,36 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
+import { getVercelOidcToken } from "@vercel/functions/oidc";
 import type { Item, Meta } from "@/lib/data";
 import { evaluateAutonomy } from "@/lib/logic";
-import { BRIEF_SYSTEM, buildBriefFacts, deterministicBrief } from "@/lib/brief";
+import { BRIEF_SYSTEM, buildBriefFacts, deterministicBrief, factLines } from "@/lib/brief";
 
 export const runtime = "nodejs";
 
 const ROOT = path.join(process.cwd(), "data");
-/** Two ways to reach Claude: a direct Anthropic key (model id claude-opus-5-5), or Vercel AI Gateway with the project's
- *  OIDC token or an AI_GATEWAY_API_KEY (gateway model id anthropic/claude-opus-5.5, from https://ai-gateway.vercel.sh/v1/models). */
+/** Model paths, in order. A direct Anthropic key uses the official API (claude-opus-5-5). Otherwise the call goes
+ *  through Vercel AI Gateway with the deployment's OIDC identity (no key to manage): Claude first, then Gemini 2.5 Flash,
+ *  which the gateway's free tier allows. A direct Gemini key (GEMINI_API_KEY, as on the G20 dashboard) is a last paid-free path.
+ *  Model ids for the gateway come from https://ai-gateway.vercel.sh/v1/models. */
 const DIRECT_MODEL = process.env.BRIEF_MODEL ?? "claude-opus-5-5";
-const GATEWAY_MODEL = process.env.BRIEF_GATEWAY_MODEL ?? "anthropic/claude-opus-5.5";
+const GATEWAY_MODELS = (process.env.BRIEF_GATEWAY_MODELS ?? "anthropic/claude-opus-5.5,google/gemini-2.5-flash-lite,google/gemini-2.5-flash").split(",").map((m) => m.trim()).filter(Boolean);
+const GEMINI_MODEL = process.env.GEMINI_MODEL ?? "gemini-flash-latest";
+
+async function gatewayToken(): Promise<string | undefined> {
+  if (process.env.AI_GATEWAY_API_KEY) return process.env.AI_GATEWAY_API_KEY;
+  try { return getVercelOidcToken(); } catch { return process.env.VERCEL_OIDC_TOKEN || undefined; }
+}
+
+async function geminiDirect(apiKey: string, system: string, user: string): Promise<string> {
+  const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(GEMINI_MODEL)}:generateContent`, {
+    method: "POST", headers: { "content-type": "application/json", "x-goog-api-key": apiKey }, signal: AbortSignal.timeout(25_000),
+    body: JSON.stringify({ systemInstruction: { parts: [{ text: system }] }, contents: [{ role: "user", parts: [{ text: user }] }], generationConfig: { maxOutputTokens: 600, temperature: 0.4 } }),
+  });
+  if (!r.ok) throw new Error(`gemini ${r.status}`);
+  const d = (await r.json()) as { candidates?: { content?: { parts?: { text?: string }[] } }[] };
+  return (d.candidates?.[0]?.content?.parts ?? []).map((p) => p.text ?? "").join("").trim();
+}
 
 /** GET /api/brief?store=S09&week=0 → { text, source: "claude" | "facts", model?, facts }.
  *  Facts are computed here from the exported data; Claude (through Vercel AI Gateway, Anthropic Messages API) only rephrases them.
@@ -34,23 +53,39 @@ export async function GET(req: Request) {
   const facts = buildBriefFacts(meta, st, items, week, levels);
   const fallback = deterministicBrief(facts);
 
+  const user = `FACTS\n${factLines(facts).map((l) => `- ${l}`).join("\n")}\n\nDRAFT (already correct)\n${fallback}`;
   const direct = process.env.ANTHROPIC_API_KEY;
-  const gatewayKey = process.env.AI_GATEWAY_API_KEY ?? process.env.VERCEL_OIDC_TOKEN;
-  if (!direct && !gatewayKey) return NextResponse.json({ text: fallback, source: "facts", facts });
+  const tried: string[] = [];
   try {
-    const client = direct
-      ? new Anthropic({ apiKey: direct, timeout: 25_000, maxRetries: 1 })
-      : new Anthropic({ apiKey: gatewayKey, baseURL: "https://ai-gateway.vercel.sh", timeout: 25_000, maxRetries: 1 });
-    const res = await client.messages.create({
-      model: direct ? DIRECT_MODEL : GATEWAY_MODEL,
-      max_tokens: 600,
-      system: BRIEF_SYSTEM,
-      messages: [{ role: "user", content: JSON.stringify(facts) }],
-    });
+    let res: Anthropic.Message | null = null;
+    if (direct) {
+      const client = new Anthropic({ apiKey: direct, timeout: 25_000, maxRetries: 1 });
+      res = await client.messages.create({ model: DIRECT_MODEL, max_tokens: 2000, system: BRIEF_SYSTEM, messages: [{ role: "user", content: user }] });
+    } else {
+      const token = await gatewayToken();
+      if (token) {
+        const client = new Anthropic({ apiKey: token, baseURL: "https://ai-gateway.vercel.sh", timeout: 25_000, maxRetries: 0 });
+        for (const model of GATEWAY_MODELS) {
+          tried.push(model);
+          try {
+            const r = await client.messages.create({ model, max_tokens: 2000, system: BRIEF_SYSTEM, messages: [{ role: "user", content: user }] });
+            const words = r.content.filter((b): b is Anthropic.TextBlock => b.type === "text").map((b) => b.text).join(" ").trim().split(/\s+/).filter(Boolean).length;
+            if (r.stop_reason === "refusal" || words < 60) continue; // truncated or declined: try the next model
+            res = r; break;
+          }
+          catch (err) { if (err instanceof Anthropic.APIError && (err.status === 403 || err.status === 404 || err.status === 402)) continue; throw err; }
+        }
+      }
+      if (!res && process.env.GEMINI_API_KEY) {
+        const text = await geminiDirect(process.env.GEMINI_API_KEY, BRIEF_SYSTEM, user);
+        if (text) return NextResponse.json({ text, source: "model", model: GEMINI_MODEL, facts }, { headers: { "cache-control": "no-store" } });
+      }
+    }
+    if (!res) return NextResponse.json({ text: fallback, source: "facts", reason: tried.length ? "no model available" : "no credential", facts });
     if (res.stop_reason === "refusal") return NextResponse.json({ text: fallback, source: "facts", facts });
     const text = res.content.filter((b): b is Anthropic.TextBlock => b.type === "text").map((b) => b.text).join("\n").trim();
     if (!text) return NextResponse.json({ text: fallback, source: "facts", facts });
-    return NextResponse.json({ text, source: "claude", model: res.model, facts }, { headers: { "cache-control": "no-store" } });
+    return NextResponse.json({ text, source: "model", model: res.model, facts }, { headers: { "cache-control": "no-store" } });
   } catch (err) {
     const reason = err instanceof Anthropic.APIError ? `${err.status}` : "error";
     return NextResponse.json({ text: fallback, source: "facts", reason, facts });
