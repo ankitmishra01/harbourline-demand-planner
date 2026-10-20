@@ -1,29 +1,13 @@
-"use client";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-
-const NAV = [["/discovery/", "Discovery"], ["/planner/", "Planner"], ["/models/", "Models"], ["/business-case/", "Business case"], ["/plan/", "Delivery plan"], ["/enablement/", "Enablement"], ["/security/", "Security"], ["/about/", "About"]];
-
 import { DISCLAIMER, DISCLAIMER_SHORT, GITHUB_URL } from "@/lib/brand";
 export { DISCLAIMER, DISCLAIMER_SHORT, GITHUB_URL };
 
+/** Page body inside the rail frame (see Rail, rendered by the root layout): the prototype notice, the page and the footer. */
 export default function Shell({ children, notice = true }: { children: React.ReactNode; notice?: boolean }) {
-  const path = usePathname();
   return (
     <>
-      <header className="top">
-        <div className="top-inner">
-          <Link className="logo" href="/" aria-label="Harbourline Foods demand planner, home">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/brand/harbourline-wordmark-paper.svg" alt="Harbourline Foods" />
-            <span>Demand planner prototype</span>
-          </Link>
-          <nav aria-label="Product pages">{NAV.map(([href, label]) => <Link key={href} href={href} className={path?.startsWith(href) ? "active" : ""} aria-current={path?.startsWith(href) ? "page" : undefined}>{label}</Link>)}</nav>
-          <span className="demo">Synthetic data</span>
-        </div>
-      </header>
       {notice && <div className="disclaimer"><strong>Prototype.</strong> <span>{DISCLAIMER_SHORT}</span> <Link href="/about/">About this prototype</Link></div>}
-      <main>{children}</main>
+      <main id="content">{children}</main>
       <footer>{DISCLAIMER} Harbourline Foods is drawn as a mid-sized Canadian grocer (300 stores, $200M revenue); store, sales and stock data are generated, with seasonality and food price inflation calibrated to public Statistics Canada series. <Link href="/handoff/">Handoff pack</Link> · <Link href="/how-it-was-built/">How it was built</Link> · <a href={GITHUB_URL}>Source on GitHub</a>.</footer>
     </>
   );

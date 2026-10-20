@@ -41,7 +41,7 @@ export default async function Landing() {
         <div><span className="k">Items needing a planner</span><strong>{needs} <span className="muted">of {stores.length * stores[0].skus}</span></strong></div>
         <div><span className="k">Forecast error (WAPE)</span><strong>{pct(meta.chain_kpis.wape)}</strong></div>
         <div><span className="k">In stock</span><strong>{pct(meta.chain_kpis.in_stock)}</strong></div>
-        <div><span className="k">Model in use</span><strong>{ranked[0]?.label.split(" (")[0]}</strong></div>
+        <div><span className="k">Model in use</span><strong>{(meta.backtest.find((b) => b.model === meta.selected_model) ?? ranked[0])?.label.split(" (")[0]}</strong></div>
       </section>
 
       <section className="workspace landing-workspace" aria-label="What is inside">
