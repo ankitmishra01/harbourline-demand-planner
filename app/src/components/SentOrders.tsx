@@ -1,4 +1,5 @@
 "use client";
+import { useEffect, useState } from "react";
 import { money } from "@/lib/data";
 import { PO_STATUSES, STATUS_AFTER_SECONDS, statusAt, type PurchaseOrder } from "@/lib/logic";
 
@@ -8,7 +9,18 @@ const EDI: Record<PurchaseOrder["status"], string> = { Sent: "EDI 850", Acknowle
 export const full = (x: number) => `$${x.toLocaleString("en-CA", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
 /** Orders already sent, one card per purchase order, with the simulated supplier replies as a progress tracker. */
-export default function SentOrders({ pos, now, weekNumbers }: { pos: PurchaseOrder[]; now: number; weekNumbers: [number, number] }) {
+export default function SentOrders({ pos, weekNumbers }: { pos: PurchaseOrder[]; weekNumbers: [number, number] }) {
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const tick = () => setNow(Date.now());
+    tick();
+    if (!pos.some((po) => statusAt(po, Date.now()) !== "Received")) return;
+    const timer = setInterval(() => {
+      tick();
+      if (pos.every((po) => statusAt(po, Date.now()) === "Received")) clearInterval(timer);
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [pos]);
   return (
     <div className="card">
       <h2>Sent orders</h2>

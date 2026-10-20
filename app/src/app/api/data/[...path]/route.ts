@@ -1,8 +1,16 @@
-import { readFile } from "node:fs/promises";
+import { readFile, readdir } from "node:fs/promises";
 import path from "node:path";
 import { NextResponse } from "next/server";
 
 export const runtime = "nodejs";
+// The synthetic dataset changes only with a deployment. Build every response once,
+// so opening a store does not need a serverless invocation or filesystem read.
+export const dynamic = "force-static";
+export const dynamicParams = false;
+export async function generateStaticParams() {
+  const stores = await readdir(path.join(process.cwd(), "data", "store"));
+  return [{ path: ["meta.json"] }, ...stores.filter((name) => /^S\d{2}\.json$/.test(name)).map((name) => ({ path: ["store", name] }))];
+}
 
 /** Serves the exported JSON (app/data/, written by pipeline/export.py). Synthetic data, public. */
 const ROOT = path.join(process.cwd(), "data");
