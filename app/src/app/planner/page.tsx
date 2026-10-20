@@ -26,8 +26,9 @@ const r0 = (x: number) => Math.round(x).toLocaleString();
 
 export default function Planner() {
   const [meta, setMeta] = useState<Meta | null>(null);
-  const [storeId, setStoreId] = useState("S09");
-  const [data, setData] = useState<StoreData | null>(null);
+  const [storeId, setStoreId] = useState("");
+  const [loadedData, setData] = useState<StoreData | null>(null);
+  const data = loadedData?.store === storeId ? loadedData : null;
   const [week, setWeek] = useState(0);
   const [q, setQ] = useState("");
   const [dept, setDept] = useState(""); const [cat, setCat] = useState(""); const [sub, setSub] = useState("");
@@ -42,18 +43,30 @@ export default function Planner() {
   const [offerDecisions, setOfferDecisions] = useState<Record<string, OfferDecision>>({});
   const [sheet, setSheet] = useState(false);
   const [autoOpen, setAutoOpen] = useState(false);
-  const [now, setNow] = useState(() => Date.now());
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [retry, setRetry] = useState(0);
 
   useEffect(() => {
-    loadMeta().then(setMeta);
-    // Deep link from the landing page store tiles: /planner/?store=S01
-    try { const q = new URLSearchParams(window.location.search).get("store"); if (q && /^S\d{2}$/.test(q)) setStoreId(q); } catch { /* ignore */ }
+    let active = true;
+    setLoadError(null);
+    loadMeta().then((m) => {
+      if (!active) return;
+      setMeta(m);
+      const requested = new URLSearchParams(window.location.search).get("store");
+      setStoreId(m.stores.some((s) => s.store === requested) ? requested! : "S09");
+    }).catch(() => { if (active) setLoadError("The planner data could not be loaded. Please retry."); });
     setDecisions(store.get("decisions", {})); setLog(store.get("changelog", [])); setSent(store.get("sentorders", [])); setOfferDecisions(store.get("offers", {}));
     try { const u = localStorage.getItem("planner"); if (u) setUser(u.split("@")[0]); } catch { /* ignore */ }
-  }, []);
-  useEffect(() => { setData(null); loadStore(storeId).then(setData); }, [storeId]);
-  // Simulated supplier replies move sent orders along; tick while any order is still in flight.
-  useEffect(() => { const t = setInterval(() => setNow(Date.now()), 1000); return () => clearInterval(t); }, []);
+    return () => { active = false; };
+  }, [retry]);
+  useEffect(() => {
+    if (!storeId) return;
+    let active = true;
+    setData(null); setLoadError(null);
+    loadStore(storeId).then((value) => { if (active) setData(value); })
+      .catch(() => { if (active) setLoadError("This store could not be loaded. Please retry."); });
+    return () => { active = false; };
+  }, [storeId, retry]);
 
   const prod = useMemo(() => new Map((meta?.products ?? []).map((p) => [p.sku, p])), [meta]);
   const addLog = useCallback((sku: string, w: number, text: string) => {
@@ -114,6 +127,7 @@ export default function Planner() {
     addLog(o.sku, 0, `${o.kind === "markdown" ? "Markdown" : "Flyer candidate"} ${status.toLowerCase()} by ${user}${reason ? `, reason ${reason}` : ""}: ${describe(o)}`);
   };
 
+  if (loadError) return <Shell><div className="card" role="alert"><h1>Let’s reconnect the planner</h1><p>{loadError}</p><button onClick={() => setRetry((n) => n + 1)}>Retry loading</button></div></Shell>;
   if (!meta) return <Shell><p className="muted">Loading…</p></Shell>;
   const st = meta.stores.find((s) => s.store === storeId)!;
   const wn = meta.forecast_week_numbers;
@@ -127,14 +141,16 @@ export default function Planner() {
   const sentHere = sent.filter((po) => po.po.includes(`-${storeId}-`));
 
   // Purchase orders from the final quantities, and the cash check against the store's open-to-buy.
-  const pos = data ? buildPurchaseOrders(data.items.map((it) => { const p = prod.get(it.sku)!; const fin = finalOf(it, week); return {
+  const prepareOrders = () => data ? buildPurchaseOrders(data.items.map((it) => { const p = prod.get(it.sku)!; const fin = finalOf(it, week); return {
     sku: it.sku, name: p.name, supplier: p.supplier, lead_time_days: p.lead_time_days, case_pack: p.case_pack, final_units: fin, cost: it.cost, changed: fin !== it.fc[week].order }; }),
-    storeId, new Date(now), sentHere.length + 1, week) : [];
+    storeId, new Date(), sentHere.length + 1, week) : [];
+  const pos = prepareOrders();
   const otb = openToBuyCheck(pos.reduce((s, p) => s + p.total_cost, 0), st.open_to_buy);
   const alreadySent = sentHere.some((po) => po.week === week);
   const sendOrders = () => {
-    const n = [...pos, ...sent]; setSent(n); store.set("sentorders", n); setSheet(false);
-    for (const po of pos) addLog(po.po, week, `Sent by ${user} to ${po.supplier}: ${po.lines.length} lines, ${po.cases} cases, ${money(po.total_cost)}, expected ${po.expected_delivery}${po.changed_lines ? `, ${po.changed_lines} lines changed` : ""}`);
+    const outgoing = prepareOrders(); // Stamp the actual click time, even after a long walkthrough.
+    const n = [...outgoing, ...sent]; setSent(n); store.set("sentorders", n); setSheet(false);
+    for (const po of outgoing) addLog(po.po, week, `Sent by ${user} to ${po.supplier}: ${po.lines.length} lines, ${po.cases} cases, ${money(po.total_cost)}, expected ${po.expected_delivery}${po.changed_lines ? `, ${po.changed_lines} lines changed` : ""}`);
   };
 
   const setFinal = (it: Item, p: Product, value: number) => {
@@ -303,7 +319,7 @@ export default function Planner() {
             {sentHere.length > 0 && <button className="ghost sm" onClick={clearSent}>Clear sent orders</button>}
           </div>}
         </div>
-        <SentOrders pos={sentHere} now={now} weekNumbers={wn} />
+        <SentOrders pos={sentHere} weekNumbers={wn} />
       </div>
 
       <Offers offers={offers} decisions={offerDecisions} keyOf={offerKey} onDecide={decideOffer} />

@@ -32,15 +32,26 @@ export type Meta = {
 };
 
 // Exported JSON is served by /api/data (app/data/, written by pipeline/export.py).
-const asJson = (r: Response) => r.json();
+async function fetchJson<T>(url: string): Promise<T> {
+  const response = await fetch(url, { signal: AbortSignal.timeout(10_000) });
+  if (!response.ok) throw new Error(`Data request failed (${response.status})`);
+  return response.json() as Promise<T>;
+}
 let metaPromise: Promise<Meta> | null = null;
 export function loadMeta(): Promise<Meta> {
-  metaPromise ??= fetch("/api/data/meta.json").then(asJson);
+  metaPromise ??= fetchJson<Meta>("/api/data/meta.json").catch((error) => {
+    metaPromise = null; // A transient error must not poison every subsequent visit.
+    throw error;
+  });
   return metaPromise;
 }
 const storeCache = new Map<string, Promise<StoreData>>();
 export function loadStore(id: string): Promise<StoreData> {
-  if (!storeCache.has(id)) storeCache.set(id, fetch(`/api/data/store/${id}.json`).then(asJson));
+  if (!/^S\d{2}$/.test(id)) return Promise.reject(new Error("Invalid store"));
+  if (!storeCache.has(id)) storeCache.set(id, fetchJson<StoreData>(`/api/data/store/${id}.json`).catch((error) => {
+    storeCache.delete(id);
+    throw error;
+  }));
   return storeCache.get(id)!;
 }
 
